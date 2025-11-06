@@ -3,23 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ShippingArea extends Model
 {
-    protected $fillable = ['name', 'type', 'parent_id', 'cost'];
+    use HasFactory;
 
-    public function parent()
+    protected $fillable = ['name_en', 'name_ar', 'cost', 'is_active'];
+
+    public function orders()
     {
-        return $this->belongsTo(self::class, 'parent_id');
+        return $this->hasMany(Order::class);
     }
 
-    public function children()
+    public function getNameAttribute()
     {
-        return $this->hasMany(self::class, 'parent_id');
-    }
-
-    public function scopeDistricts($query)
-    {
-        return $query->where('type', 'district');
+        return app()->getLocale() === 'ar' ? $this->name_ar : $this->name_en;
     }
 }

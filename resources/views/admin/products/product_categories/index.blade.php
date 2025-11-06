@@ -1,189 +1,123 @@
+{{-- resources/views/admin/products/product_categories/index.blade.php --}}
 @extends('admin.layouts.app')
 
+@section('title', 'Product Categories')
+
 @section('content')
-<div class="row">
-    <div class="col-xl-12">
-        <div class="card mb-3">
-            <div class="row no-gutters">
-                <div class="col-md-12">
+    <div class="container-fluid py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-md-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">Product Categories</h3>
+                        <a href="{{ route('admin.product_categories.create') }}" class="btn btn-light btn-sm">
+                            <i class="fas fa-plus"></i> Add New Category
+                        </a>
+                    </div>
                     <div class="card-body">
-
-                        <!-- Flash messages -->
-                        @if(session('status-success'))
-                            <div class="alert alert-success">{{ session('status-success') }}</div>
+                        <!-- Success Message -->
+                        @if (session('status-success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('status-success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
                         @endif
 
-                        @if(session('status-error'))
-                            <div class="alert alert-danger">{{ session('status-error') }}</div>
+                        <!-- Validation Errors -->
+                        @if ($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
                         @endif
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="card-title pt-2">Product Categories</h5>
+                        <!-- Categories Table -->
+                        @if ($categories->isEmpty())
+                            <div class="text-center py-4">
+                                <p class="text-muted">No product categories found.</p>
+                                <a href="{{ route('admin.product_categories.create') }}" class="btn btn-primary">Add Category Now</a>
                             </div>
-                            <div class="col-md-6 text-right">
-                                <a href="{{ route('admin.product_categories.create') }}" class="btn btn-primary">Add New</a>
-                            </div>
-                        </div>
-
-                        <!-- Language Tabs -->
-                        <ul class="nav nav-tabs mt-3" id="languageTabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="en-tab" data-bs-toggle="tab" href="#en" role="tab" aria-controls="en" aria-selected="true">English</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="ar-tab" data-bs-toggle="tab" href="#ar" role="tab" aria-controls="ar" aria-selected="false">Arabic</a>
-                            </li>
-                        </ul>
-
-                        <div class="tab-content" id="languageTabsContent">
-                            <!-- English Tab -->
-                            <div class="tab-pane fade show active" id="en" role="tabpanel" aria-labelledby="en-tab">
-                                <div class="table-responsive mt-3">
-                                    <table class="table table-bordered">
-                                        <thead>
+                        @else
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Image</th>
+                                            <th scope="col">Name (EN)</th>
+                                            <th scope="col">Name (AR)</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Slug</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($categories as $category)
                                             <tr>
-                                                <th>#</th>
-                                                <th>Image</th>
-                                                <th>Name (EN)</th>
-                                                <th>Description (EN)</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($categories as $category)
-                                                <tr>
-                                                    <td>{{ $category->id }}</td>
-                                                    <td>
-                                                        @if($category->image)
-                                                            <img src="{{ asset('/' . $category->image) }}" alt="image" width="60">
-                                                        @else
-                                                            <span class="text-muted">No image</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $category->name_en }}</td>
-                                                    <td>{!! Str::limit($category->description_en, 100) !!}</td>
-                                                    <td><span class="badge bg-{{ $category->status == 'active' ? 'success' : ($category->status == 'inactive' ? 'secondary' : 'warning') }}">{{ ucfirst($category->status) }}</span></td>
-                                                    <td>
-                                                        <a class="btn btn-sm btn-info" href="{{ route('admin.product_categories.edit', $category->id) }}">Edit</a>
-
-                                                        <form action="{{ route('admin.product_categories.destroy', $category->id) }}" method="POST" style="display:inline;">
+                                                <td>
+                                                    {{ $loop->iteration + ($categories->currentPage() - 1) * $categories->perPage() }}
+                                                </td>
+                                                <td>
+                                                    @if ($category->image)
+                                                        <img src="{{ asset($category->image) }}"
+                                                             alt="{{ $category->name_en }}"
+                                                             class="img-thumbnail"
+                                                             style="max-width: 80px; max-height: 80px; object-fit: cover;">
+                                                    @else
+                                                        <div class="bg-light d-flex align-items-center justify-content-center rounded"
+                                                             style="width: 80px; height: 80px;">
+                                                            <i class="fas fa-image text-muted fs-4"></i>
+                                                        </div>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $category->name_en }}</td>
+                                                <td>{{ $category->name_ar }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{
+                                                        $category->status == 'active' ? 'success' :
+                                                        ($category->status == 'inactive' ? 'danger' : 'warning')
+                                                    }}">
+                                                        {{ ucfirst($category->status) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <code class="small">{{ Str::limit($category->slug, 25) }}</code>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="{{ route('admin.product_categories.edit', $category) }}"
+                                                           class="btn btn-warning btn-sm" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <form action="{{ route('admin.product_categories.destroy', $category) }}"
+                                                              method="POST"
+                                                              onsubmit="return confirm('Are you sure you want to delete this category?');">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $category->id }}">Delete</button>
-
-                                                            <!-- Modal -->
-                                                            <div class="modal fade" id="deleteModal{{ $category->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $category->id }}" aria-hidden="true">
-                                                                <div class="modal-dialog">
-                                                                    <div class="modal-content">
-                                                                        <div class="modal-header">
-                                                                            <h5 class="modal-title" id="deleteModalLabel{{ $category->id }}">Delete Confirmation</h5>
-                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                        </div>
-                                                                        <div class="modal-body">
-                                                                            Are you sure you want to delete this category?
-                                                                        </div>
-                                                                        <div class="modal-footer">
-                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                            <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
                                                         </form>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center">No categories found.</td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Arabic Tab -->
-                            <div class="tab-pane fade" id="ar" role="tabpanel" aria-labelledby="ar-tab">
-                                <div class="table-responsive mt-3">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Image</th>
-                                                <th>Name (AR)</th>
-                                                <th>Description (AR)</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
+                                                    </div>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($categories as $category)
-                                                <tr>
-                                                    <td>{{ $category->id }}</td>
-                                                    <td>
-                                                        @if($category->image)
-                                                            <img src="{{ asset('/' . $category->image) }}" alt="image" width="60">
-                                                        @else
-                                                            <span class="text-muted">No image</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $category->name_ar }}</td>
-                                                    <td>{!! Str::limit($category->description_ar, 100) !!}</td>
-                                                    <td><span class="badge bg-{{ $category->status == 'active' ? 'success' : ($category->status == 'inactive' ? 'secondary' : 'warning') }}">{{ ucfirst($category->status) }}</span></td>
-                                                    <td>
-                                                        <a class="btn btn-sm btn-info" href="{{ route('admin.product_categories.edit', $category->id) }}">Edit</a>
-
-                                                        <form action="{{ route('admin.product_categories.destroy', $category->id) }}" method="POST" style="display:inline;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModalAR{{ $category->id }}">Delete</button>
-
-                                                            <!-- Modal -->
-                                                            <div class="modal fade" id="deleteModalAR{{ $category->id }}" tabindex="-1" aria-labelledby="deleteModalLabelAR{{ $category->id }}" aria-hidden="true">
-                                                                <div class="modal-dialog">
-                                                                    <div class="modal-content">
-                                                                        <div class="modal-header">
-                                                                            <h5 class="modal-title" id="deleteModalLabelAR{{ $category->id }}">Delete Confirmation</h5>
-                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                        </div>
-                                                                        <div class="modal-body">
-                                                                            Are you sure you want to delete this category?
-                                                                        </div>
-                                                                        <div class="modal-footer">
-                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                            <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center">No categories found.</td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
-                        </div> <!-- End tab content -->
 
+                            <!-- Bootstrap 5 Pagination -->
+                            <div class="mt-4 d-flex justify-content-center">
+                                {{ $categories->links('pagination::bootstrap-5') }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@endsection
-
-@section('scripts')
-{{-- <script src="{{ asset('dist/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script> --}}
-<script>
-    // Bootstrap tab activation if needed
-    var arTab = new bootstrap.Tab(document.querySelector('#ar-tab'));
-</script>
 @endsection

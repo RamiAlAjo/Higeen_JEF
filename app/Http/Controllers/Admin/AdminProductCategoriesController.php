@@ -12,7 +12,7 @@ class AdminProductCategoriesController extends Controller
     // Show list of product categories
     public function index()
     {
-        $categories = ProductCategory::latest()->get();
+        $categories = ProductCategory::latest()->paginate(15);
         return view('admin.products.product_categories.index', compact('categories'));
     }
 

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\ShippingArea;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class AdminOrderController extends Controller
 {
@@ -18,9 +20,57 @@ class AdminOrderController extends Controller
             $query->where('status', $request->status);
         }
 
-        $orders = $query->latest()->paginate(10);
+        $orders = $query->with(['client', 'shippingArea'])->latest()->paginate(10);
 
         return view('admin.orders.index', compact('orders'));
+    }
+
+    public function show(Order $order)
+    {
+        $order->load(['items.product', 'client', 'shippingArea']);
+        return view('admin.orders.show', compact('order'));
+    }
+
+    public function edit(Order $order)
+    {
+        $order->load(['items.product', 'client', 'shippingArea']);
+        $shippingAreas = ShippingArea::where('is_active', true)->get();
+        return view('admin.orders.edit', compact('order', 'shippingAreas'));
+    }
+
+    public function update(Request $request, Order $order)
+{
+    $field = $request->input('field');
+    $value = $request->input('value');
+
+    $allowed = [
+        'status' => ['pending','confirmed','shipped','delivered','cancelled'],
+        'payment_status' => ['unpaid','paid','failed','refunded'],
+        'delivery_status' => ['not_started','in_progress','delivered','cancelled','failed'],
+    ];
+
+    if (!isset($allowed[$field]) || !in_array($value, $allowed[$field])) {
+        return response()->json(['success' => false, 'message' => 'Invalid value'], 422);
+    }
+
+    $order->update([$field => $value]);
+
+    return response()->json(['success' => true]);
+}
+
+    public function destroy(Order $order)
+    {
+        // Optional: prevent deletion of delivered orders
+        if (in_array($order->status, ['delivered', 'cancelled'])) {
+            return back()->with('status-error', 'Cannot delete delivered or cancelled orders.');
+        }
+
+        $order->items()->delete();
+        $order->delete();
+
+        return redirect()
+            ->route('admin.orders.index')
+            ->with('status-success', 'Order deleted successfully.');
     }
 
     public function pendingOrders(Request $request)
@@ -64,7 +114,7 @@ class AdminOrderController extends Controller
                 'pending_orders' => [],
                 'pending_count' => 0,
                 'error' => 'Failed to fetch pending orders',
-            ], 100);
+            ], 500);
         }
     }
 }

@@ -11,22 +11,22 @@ class Order extends Model
 
     protected $fillable = [
         'cart_id',
+        'client_id',
         'full_name',
         'email',
         'phone_number',
-        'shipping_area',
+        'shipping_area_id',        // ← new
         'shipping_address',
+        'subtotal',
+        'shipping_cost',
         'discount',
         'discount_percent',
         'discount_type',
-        'subtotal',
-        'shipping_cost',
         'total',
         'status',
         'payment_method',
         'payment_status',
         'delivery_status',
-        'client_id',
     ];
 
     public function items()
@@ -43,4 +43,11 @@ class Order extends Model
     {
         return $this->belongsTo(Client::class);
     }
+
+    public function shippingArea()
+    {
+        return $this->belongsTo(ShippingArea::class, 'shipping_area_id');
+    }
+
+
 }

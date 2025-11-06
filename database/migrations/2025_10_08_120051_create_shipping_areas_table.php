@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('shipping_areas', function (Blueprint $table) {
+     Schema::create('shipping_areas', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->enum('type', ['country', 'area', 'city', 'district']);
-            $table->foreignId('parent_id')->nullable()->constrained('shipping_areas')->nullOnDelete();
-            $table->decimal('cost', 10, 2)->nullable();
+            $table->string('name_en');
+            $table->string('name_ar');
+            $table->decimal('cost', 8, 2)->default(0.00);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
-
-            $table->unique(['name', 'parent_id']);
         });
     }
 

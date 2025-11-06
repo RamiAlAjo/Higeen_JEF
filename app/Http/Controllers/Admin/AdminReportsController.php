@@ -37,14 +37,22 @@ class AdminReportsController extends Controller
         $query = fn($q) => $startDate && $endDate ? $q->whereBetween('orders.created_at', [$startDate, $endDate]) : $q;
 
         // Top Sales by Area
-        $topSalesByArea = Order::select('orders.shipping_area as area', DB::raw('SUM(orders.total) as total_sales'), DB::raw('COUNT(orders.id) as order_count'))
-            ->where('orders.payment_status', 'paid')
-            ->whereNotNull('orders.shipping_area')
-            ->groupBy('orders.shipping_area')
-            ->orderByDesc('total_sales')
-            ->take($limit);
+$areaNameField = app()->getLocale() === 'ar' ? 'name_ar' : 'name_en';
 
-        $topSalesByArea = $query($topSalesByArea)->get();
+$topSalesByArea = Order::select(
+        'shipping_areas.id as shipping_area_id',
+        "shipping_areas.$areaNameField as area_name",
+        DB::raw('SUM(orders.total) as total_sales'),
+        DB::raw('COUNT(orders.id) as order_count')
+    )
+    ->join('shipping_areas', 'orders.shipping_area_id', '=', 'shipping_areas.id')
+    ->where('orders.payment_status', 'paid')
+    ->whereNotNull('orders.shipping_area_id')
+    ->groupBy('shipping_areas.id', "shipping_areas.$areaNameField")
+    ->orderByDesc('total_sales')
+    ->take($limit);
+
+$topSalesByArea = $query($topSalesByArea)->get();
 
         // Top Sales by Product
         $topSalesByProduct = Product::select('products.id', "products.$productNameField as product_name", DB::raw('SUM(order_items.quantity * order_items.price) as total_sales'), DB::raw('COUNT(order_items.id) as order_count'))
