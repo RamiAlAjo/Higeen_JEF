@@ -175,8 +175,7 @@
     }
 
     .icon-fallback {
-        display: none;
-        font-size: 0.9rem;
+        display: 0.9rem;
         color: #6c757d;
     }
 
@@ -184,17 +183,10 @@
         display: inline-block !important;
     }
 
-    :root:not([data-fontawesome-loaded]) .fa, :root:not([data-fontawesome-loaded]) .fas, :root:not([data-fontawesome-loaded]) .fab {
+    :root:not([data-fontawesome-loaded]) .fa,
+    :root:not([data-fontawesome-loaded]) .fas,
+    :root:not([data-fontawesome-loaded]) .fab {
         display: none !important;
-    }
-
-    /* Progress Indicator */
-    .progress-container {
-        margin-bottom: 1.5rem;
-    }
-
-    .progress-bar {
-        background-color: var(--primary-color);
     }
 
     /* Animations */
@@ -221,11 +213,7 @@
     }
 
     /* Accessibility */
-    .form-control:focus {
-        outline: 2px solid var(--primary-color);
-        outline-offset: 2px;
-    }
-
+    .form-control:focus,
     .accordion-button:focus {
         outline: 2px solid var(--primary-color);
         outline-offset: 2px;
@@ -259,14 +247,6 @@
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-
-                <!-- Progress Indicator -->
-                {{-- <div class="progress-container">
-                    <div class="progress" role="progressbar" aria-label="Form completion progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                        <div class="progress-bar" style="width: 0%" id="progress-bar"></div>
-                    </div>
-                    <small class="text-muted">Form Completion: <span id="progress-text">0%</span></small>
-                </div> --}}
 
                 <!-- Success Message -->
                 @if(session('status-success'))
@@ -429,104 +409,122 @@
                             </div>
                         </div>
 
-                        <!-- Contact Information Section -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="contactHeading">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#contactCollapse" aria-expanded="false" aria-controls="contactCollapse">
-                                    <i class="fas fa-address-book me-2" aria-hidden="true"></i>
-                                    <span class="icon-fallback">Contact</span> Contact Information
-                                </button>
-                            </h2>
-                            <div id="contactCollapse" class="accordion-collapse collapse" aria-labelledby="contactHeading" data-bs-parent="#settingsAccordion">
-                                <div class="accordion-body">
-                                    <div class="form-group mb-3">
-                                        <label for="phone1" data-bs-toggle="tooltip" title="Primary phone number for contact">Phone Number</label>
-                                        <input type="tel" class="form-control @error('phone.0') is-invalid @enderror" name="phone[]" id="phone1" placeholder="123-456-7890" value="{{ old('phone.0', $phones[0] ?? '') }}" aria-describedby="phone1-error">
-                                        @error('phone.0')
-                                            <div class="invalid-feedback" id="phone1-error">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div id="additional-phones">
-                                        @foreach($phones as $index => $phone)
-                                            @if ($index > 0)
-                                                <div class="form-group mb-3" id="phone{{ $index + 1 }}-container">
-                                                    <label for="phone{{ $index + 1 }}">Phone {{ $index + 1 }}</label>
-                                                    <div class="input-group">
-                                                        <input type="tel" class="form-control @error('phone.' . $index) is-invalid @enderror" name="phone[]" id="phone{{ $index + 1 }}" placeholder="Phone Number" value="{{ old('phone.' . $index, $phone) }}" aria-describedby="phone{{ $index + 1 }}-error">
-                                                        <button type="button" class="btn btn-danger" onclick="removePhoneField({{ $index + 1 }})" aria-label="Remove phone number"><i class="fas fa-trash" aria-hidden="true"></i><span class="icon-fallback">Remove</span></button>
-                                                        @error('phone.' . $index)
-                                                            <div class="invalid-feedback" id="phone{{ $index + 1 }}-error">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="add-phone-btn" aria-label="Add another phone number"><i class="fas fa-plus me-1" aria-hidden="true"></i><span class="icon-fallback">Add</span> Add Another Phone Number</button>
-                                    <div class="form-group mb-3">
-                                        <label for="fax" data-bs-toggle="tooltip" title="Fax number for business communication">Fax</label>
-                                        <input type="tel" class="form-control @error('fax') is-invalid @enderror" name="fax" id="fax" placeholder="123-456-7890" value="{{ old('fax', $settings->fax ?? '') }}" aria-describedby="fax-error">
-                                        @error('fax')
-                                            <div class="invalid-feedback" id="fax-error">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="email" data-bs-toggle="tooltip" title="Primary email for general inquiries">Email</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-envelope" aria-hidden="true"></i><span class="icon-fallback">Email</span></span>
-                                            <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="email" placeholder="info@example.com" value="{{ old('email', $settings->email ?? '') }}" aria-describedby="email-error">
-                                            @error('email')
-                                                <div class="invalid-feedback" id="email-error">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="contact_email" data-bs-toggle="tooltip" title="Email for contact form submissions">Contact Email</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-envelope" aria-hidden="true"></i><span class="icon-fallback">Contact</span></span>
-                                            <input type="email" class="form-control @error('contact_email') is-invalid @enderror" name="contact_email" id="contact_email" placeholder="contact@example.com" value="{{ old('contact_email', $settings->contact_email ?? '') }}" aria-describedby="contact_email-error">
-                                            @error('contact_email')
-                                                <div class="invalid-feedback" id="contact_email-error">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="carrers_email" data-bs-toggle="tooltip" title="Email for job applications">Careers Email</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-envelope" aria-hidden="true"></i><span class="icon-fallback">Careers</span></span>
-                                            <input type="email" class="form-control @error('carrers_email') is-invalid @enderror" name="carrers_email" id="carrers_email" placeholder="careers@example.com" value="{{ old('carrers_email', $settings->carrers_email ?? '') }}" aria-describedby="carrers_email-error">
-                                            @error('carrers_email')
-                                                <div class="invalid-feedback" id="carrers_email-error">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="address" data-bs-toggle="tooltip" title="Physical address of the business">Address</label>
-                                        <input type="text" class="form-control @error('address') is-invalid @enderror" name="address" id="address" placeholder="123 Main St, City, Country" value="{{ old('address', $settings->address ?? '') }}" aria-describedby="address-error">
-                                        @error('address')
-                                            <div class="invalid-feedback" id="address-error">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="location" data-bs-toggle="tooltip" title="Geographic location or branch name">Location</label>
-                                        <input type="text" class="form-control @error('location') is-invalid @enderror" name="location" id="location" placeholder="Main Office" value="{{ old('location', $settings->location ?? '') }}" aria-describedby="location-error">
-                                        @error('location')
-                                            <div class="invalid-feedback" id="location-error">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="url" data-bs-toggle="tooltip" title="Primary URL of the website">Site URL</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-globe" aria-hidden="true"></i><span class="icon-fallback">URL</span></span>
-                                            <input type="url" class="form-control @error('url') is-invalid @enderror" name="url" id="url" placeholder="https://example.com" value="{{ old('url', $settings->url ?? '') }}" aria-describedby="url-error">
-                                            @error('url')
-                                                <div class="invalid-feedback" id="url-error">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
+                   <!-- Contact Information Section -->
+<div class="accordion-item">
+    <h2 class="accordion-header" id="contactHeading">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#contactCollapse">
+            Contact Information
+        </button>
+    </h2>
+    <div id="contactCollapse" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+        <div class="accordion-body">
+
+            <!-- Phones -->
+            <div class="form-group mb-3">
+                <label>Phone Number</label>
+                <input type="tel" name="phone[]" class="form-control" placeholder="123-456-7890"
+                       value="{{ old('phone.0', $phones[0] ?? '') }}">
+            </div>
+
+            <div id="additional-phones">
+                @foreach($phones as $index => $phone)
+                    @if($index > 0)
+                    <div class="input-group mb-3 phone-item">
+                        <input type="tel" name="phone[]" class="form-control" value="{{ old("phone.$index", $phone) }}">
+                        <button type="button" class="btn btn-danger remove-phone">Remove</button>
+                    </div>
+                    @endif
+                @endforeach
+            </div>
+
+            <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="add-phone">
+                Add Phone
+            </button>
+
+            <!-- Other fields -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label>Fax</label>
+                        <input type="tel" name="fax" class="form-control" value="{{ old('fax', $settings->fax ?? '') }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ old('email', $settings->email ?? '') }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label>Contact Form Email</label>
+                        <input type="email" name="contact_email" class="form-control" value="{{ old('contact_email', $settings->contact_email ?? '') }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label>Careers Email</label>
+                        <input type="email" name="carrers_email" class="form-control" value="{{ old('carrers_email', $settings->carrers_email ?? '') }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Default Address (for SEO)</label>
+                <input type="text" name="address" class="form-control" value="{{ old('address', $settings->address ?? '') }}">
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Site URL</label>
+                <input type="url" name="url" class="form-control" value="{{ old('url', $settings->url ?? '') }}">
+            </div>
+
+            <!-- Multiple Locations -->
+            <hr>
+            <h6 class="mt-4 mb-3">Branches / Locations</h6>
+            <div id="locations-container">
+                @foreach($settings->locations ?? [] as $index => $loc)
+                <div class="card mb-3 location-item">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label>Name</label>
+                                <input type="text" name="locations[{{ $index }}][name]" class="form-control"
+                                       value="{{ old("locations.$index.name", $loc['name'] ?? '') }}" required>
+                            </div>
+                            <div class="col-md-5">
+                                <label>Address</label>
+                                <input type="text" name="locations[{{ $index }}][address]" class="form-control"
+                                       value="{{ old("locations.$index.address", $loc['address'] ?? '') }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label>Lat</label>
+                                <input type="text" name="locations[{{ $index }}][lat]" class="form-control"
+                                       value="{{ old("locations.$index.lat", $loc['lat'] ?? '') }}" placeholder="31.9787532">
+                            </div>
+                            <div class="col-md-2">
+                                <label>Lng</label>
+                                <input type="text" name="locations[{{ $index }}][lng]" class="form-control"
+                                       value="{{ old("locations.$index.lng", $loc['lng'] ?? '') }}" placeholder="35.9004003">
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger btn-sm remove-location">Remove</button>
                             </div>
                         </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <button type="button" class="btn btn-outline-primary btn-sm" id="add-location">
+                Add Location
+            </button>
+        </div>
+    </div>
+</div>
 
                         <!-- Logo Section -->
                         <div class="accordion-item">
@@ -539,10 +537,10 @@
                             <div id="logoCollapse" class="accordion-collapse collapse" aria-labelledby="logoHeading" data-bs-parent="#settingsAccordion">
                                 <div class="accordion-body">
                                     <div class="form-group mb-3">
-                                        <label for="logo" data-bs-toggle="tooltip" title="Upload a logo image (max 2MB, PNG/JPG)">Logo</label>
+                                        <label for="logo" data-bs-toggle="tooltip" title="Upload a logo image (max 10MB, PNG/JPG/WEBP)">Logo</label>
                                         <div class="logo-dropzone" id="logo-dropzone">
                                             <p class="mb-0">Drag & Drop your logo here or click to upload</p>
-                                            <input type="file" class="form-control-file @error('logo') is-invalid @enderror" name="logo" id="logo" accept="image/png,image/jpeg" aria-describedby="logo-error" hidden>
+                                            <input type="file" class="form-control-file @error('logo') is-invalid @enderror" name="logo" id="logo" accept="image/png,image/jpeg,image/webp" aria-describedby="logo-error" hidden>
                                         </div>
                                         @error('logo')
                                             <div class="invalid-feedback d-block" id="logo-error">{{ $message }}</div>
@@ -564,8 +562,12 @@
 
                     <!-- Form Buttons -->
                     <div class="form-buttons">
-                        <button type="submit" class="btn btn-pill" aria-label="Save settings"><i class="fas fa-save me-2" aria-hidden="true"></i><span class="icon-fallback">Save</span> Save Settings</button>
-                        <button type="button" class="btn btn-outline-secondary btn-pill" onclick="confirmCancel()" aria-label="Cancel and reset form"><i class="fas fa-times me-2" aria-hidden="true"></i><span class="icon-fallback">Cancel</span> Cancel</button>
+                        <button type="submit" class="btn btn-pill" aria-label="Save settings">
+                            <i class="fas fa-save me-2" aria-hidden="true"></i><span class="icon-fallback">Save</span> Save Settings
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-pill" onclick="confirmCancel()" aria-label="Cancel and reset form">
+                            <i class="fas fa-times me-2" aria-hidden="true"></i><span class="icon-fallback">Cancel</span> Cancel
+                        </button>
                     </div>
                 </form>
             </div>
@@ -575,8 +577,9 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Debug form submission
         const form = document.getElementById("settings-form");
+
+        // Debug form submission
         form.addEventListener("submit", function(event) {
             console.log("Form submitted");
             const formData = new FormData(form);
@@ -593,8 +596,8 @@
             document.documentElement.setAttribute('data-fontawesome-loaded', 'true');
         }
 
-        let phoneCount = {{ count($phones) }}; // Initial count of phone fields
-        const maxPhones = 3; // Maximum number of phone fields allowed
+        let phoneCount = {{ count($phones) }};
+        const maxPhones = 3;
 
         // Initialize Bootstrap tooltips
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -626,7 +629,6 @@
         window.removePhoneField = function(phoneIndex) {
             document.getElementById(`phone${phoneIndex}-container`).remove();
             phoneCount--;
-            updateProgress();
         };
 
         // Show loading overlay on form submit
@@ -634,7 +636,7 @@
             document.getElementById("loading-overlay").style.display = "flex";
         });
 
-        // Client-side validation for URLs, emails, and phones
+        // Client-side validation
         const urlInputs = document.querySelectorAll('input[type="url"]');
         const emailInputs = document.querySelectorAll('input[type="email"]');
         const phoneInputs = document.querySelectorAll('input[type="tel"]');
@@ -649,7 +651,6 @@
                     this.classList.remove('is-invalid');
                     if (this.value) this.classList.add('is-valid');
                 }
-                updateProgress();
             });
         });
 
@@ -663,7 +664,6 @@
                     this.classList.remove('is-invalid');
                     if (this.value) this.classList.add('is-valid');
                 }
-                updateProgress();
             });
         });
 
@@ -677,7 +677,6 @@
                     this.classList.remove('is-invalid');
                     if (this.value) this.classList.add('is-valid');
                 }
-                updateProgress();
             });
         });
 
@@ -731,7 +730,6 @@
                         <label class="form-check-label" for="remove_logo">Remove Logo</label>
                     </div>
                 `;
-                updateProgress();
             };
             reader.readAsDataURL(file);
         }
@@ -749,25 +747,63 @@
                         </div>
                     @endif
                 `;
-                updateProgress();
             }
         };
-
-        // Update progress bar
-        function updateProgress() {
-            const inputs = form.querySelectorAll('input:not([type="checkbox"]), textarea');
-            let filledInputs = 0;
-            inputs.forEach(input => {
-                if (input.value.trim()) filledInputs++;
-            });
-            const progress = (filledInputs / inputs.length) * 100;
-            document.getElementById("progress-bar").style.width = `${progress}%`;
-            document.getElementById("progress-text").textContent = `${Math.round(progress)}%`;
-            document.getElementById("progress-bar").setAttribute("aria-valuenow", Math.round(progress));
-        }
-
-        // Initial progress update
-        updateProgress();
     });
+</script>
+
+<script>
+document.getElementById('add-location')?.addEventListener('click', function () {
+    const container = document.getElementById('locations-container');
+    const index = container.children.length;
+
+    const html = `
+        <div class="card mb-3 location-item">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label>Name</label>
+                        <input type="text" name="locations[${index}][name]" class="form-control" required>
+                    </div>
+                    <div class="col-md-5">
+                        <label>Address</label>
+                        <input type="text" name="locations[${index}][address]" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <label>Lat</label>
+                        <input type="text" name="locations[${index}][lat]" class="form-control" placeholder="31.9787532">
+                    </div>
+                    <div class="col-md-2">
+                        <label>Lng</label>
+                        <input type="text" name="locations[${index}][lng]" class="form-control" placeholder="35.9004003">
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm remove-location">Remove</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+});
+
+document.addEventListener('click', function (e) {
+    if (e.target.matches('.remove-location')) {
+        e.target.closest('.location-item').remove();
+    }
+    if (e.target.matches('.remove-phone')) {
+        e.target.closest('.phone-item').remove();
+    }
+});
+
+document.getElementById('add-phone')?.addEventListener('click', function () {
+    const html = `
+        <div class="input-group mb-3 phone-item">
+            <input type="tel" name="phone[]" class="form-control" placeholder="Phone Number">
+            <button type="button" class="btn btn-danger remove-phone">Remove</button>
+        </div>
+    `;
+    document.getElementById('additional-phones').insertAdjacentHTML('beforeend', html);
+});
 </script>
 @endsection

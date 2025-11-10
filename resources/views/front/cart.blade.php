@@ -48,7 +48,7 @@
                       </div>
                     </td>
                     <td class="text-center price" data-price="{{ $item->price_at_time }}">
-                      {{ number_format($item->price_at_time, 3) }} JD
+                      {{ number_format($item->price_at_time, 3) }} NIS
                     </td>
                     <td class="text-center">
                       <div class="quantity-box d-inline-flex">
@@ -58,7 +58,7 @@
                       </div>
                     </td>
                     <td class="text-center total fw-semibold text-primary-color">
-                      {{ number_format($item->price_at_time * $item->quantity, 3) }} JD
+                      {{ number_format($item->price_at_time * $item->quantity, 3) }} NIS
                     </td>
                     <td class="text-center">
                       <button type="button" class="btn btn-sm btn-outline-danger remove-item rounded-pill px-3" data-id="{{ $item->id }}">
@@ -96,7 +96,7 @@
           <h4 class="mb-4 text-primary-color border-bottom pb-3">{{ __('cart.summary') }}</h4>
           <div class="d-flex justify-content-between py-2 border-bottom">
             <span>{{ __('cart.subtotal') }}:</span>
-            <span id="subtotal" class="fw-semibold">{{ number_format($cartItems->sum(fn($i) => $i->price_at_time * $i->quantity), 3) }} JD</span>
+            <span id="subtotal" class="fw-semibold">{{ number_format($cartItems->sum(fn($i) => $i->price_at_time * $i->quantity), 3) }} NIS</span>
           </div>
           <div class="d-flex justify-content-between py-2 border-bottom">
             <span>{{ __('cart.shipping') }}:</span>
@@ -104,11 +104,11 @@
           </div>
           <div class="d-flex justify-content-between py-2 border-bottom">
             <span>{{ __('cart.tax') }}:</span>
-            <span id="tax" class="fw-semibold">0.000 JD</span>
+            <span id="tax" class="fw-semibold">0.000 NIS</span>
           </div>
           <div class="d-flex justify-content-between fw-bold py-3 text-lg">
             <span>{{ __('cart.grand_total') }}:</span>
-            <span id="grandtotal" class="text-primary-color">{{ number_format($cartItems->sum(fn($i) => $i->price_at_time * $i->quantity), 3) }} JD</span>
+            <span id="grandtotal" class="text-primary-color">{{ number_format($cartItems->sum(fn($i) => $i->price_at_time * $i->quantity), 3) }} NIS</span>
           </div>
           <a href="{{ route ('checkout.index') }}" class="proceed-btn btn btn-lg w-100 rounded-pill mt-3 shadow-sm">{{ __('cart.checkout') }}</a>
           <div class="mt-3 text-center">
@@ -322,7 +322,7 @@
 
       const price = parseFloat(priceCell.dataset.price);
       const newTotal = (qty * price).toFixed(3);
-      totalCell.textContent = `${newTotal} JD`;
+      totalCell.textContent = `${newTotal} NIS`;
 
       // Update server
       const itemId = row.dataset.itemId;
@@ -351,7 +351,7 @@
     function updateCartTotals() {
       let subtotal = 0;
       document.querySelectorAll('.cart-table tbody tr').forEach(row => {
-        const totalText = row.querySelector('.total').textContent.replace(' JD', '');
+        const totalText = row.querySelector('.total').textContent.replace(' NIS', '');
         const totalVal = parseFloat(totalText);
         if (!isNaN(totalVal)) subtotal += totalVal;
       });
@@ -359,9 +359,9 @@
       const tax = parseFloat((subtotal * taxRate).toFixed(3));
       const grandtotal = parseFloat((subtotal + tax).toFixed(3));
 
-      subtotalEl.textContent = `${subtotal.toFixed(3)} JD`;
-      taxEl.textContent = `${tax.toFixed(3)} JD`;
-      grandtotalEl.textContent = `${grandtotal.toFixed(3)} JD`;
+      subtotalEl.textContent = `${subtotal.toFixed(3)} NIS`;
+      taxEl.textContent = `${tax.toFixed(3)} NIS`;
+      grandtotalEl.textContent = `${grandtotal.toFixed(3)} NIS`;
     }
 
     // Toast function (Bootstrap toast)

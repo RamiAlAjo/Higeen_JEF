@@ -76,9 +76,9 @@
 
                             <!-- Cost -->
                             <div class="col-md-6">
-                                <label for="cost" class="form-label">Shipping Cost (JOD) <span class="text-danger">*</span></label>
+                                <label for="cost" class="form-label">Shipping Cost (NIS) <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <span class="input-group-text">JOD</span>
+                                    <span class="input-group-text">NIS</span>
                                     <input type="number"
                                            name="cost"
                                            id="cost"

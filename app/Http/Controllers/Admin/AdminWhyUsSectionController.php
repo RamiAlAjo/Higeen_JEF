@@ -34,7 +34,7 @@ public function create()
         'pages.*.title_ar' => 'required|string',
         'pages.*.description_en' => 'nullable|string', // Allow HTML
         'pages.*.description_ar' => 'nullable|string', // Allow HTML
-        'pages.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        'pages.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10048',
     ]);
 
     foreach ($request->pages as $page) {
@@ -78,7 +78,7 @@ public function update(Request $request, $aboutUsId)
         'pages.*.title_ar' => 'required|string',
         'pages.*.description_en' => 'nullable|string',
         'pages.*.description_ar' => 'nullable|string',
-        'pages.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        'pages.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10048',
     ]);
 
     $aboutUs = AboutUs::findOrFail($aboutUsId);

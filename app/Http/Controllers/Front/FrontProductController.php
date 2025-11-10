@@ -57,17 +57,17 @@ class FrontProductController extends Controller
 
         $cart = $this->getOrCreateCart();
         $cartItemCount = $cart->items()->sum('quantity');
-        $currency = session('currency', 'JOD');
+        $currency = session('currency', 'NIS');
 
         // Convert product prices
         $products->getCollection()->transform(function ($product) use ($currency) {
-            $product->display_price = $this->currencyService->convert($product->price, 'JOD', $currency);
+            $product->display_price = $this->currencyService->convert($product->price, 'NIS', $currency);
             $product->display_price_formatted = $this->currencyService->format($product->display_price, $currency);
             return $product;
         });
 
         $bestSellers->transform(function ($product) use ($currency) {
-            $product->display_price = $this->currencyService->convert($product->price, 'JOD', $currency);
+            $product->display_price = $this->currencyService->convert($product->price, 'NIS', $currency);
             $product->display_price_formatted = $this->currencyService->format($product->display_price, $currency);
             return $product;
         });
@@ -85,8 +85,8 @@ class FrontProductController extends Controller
                           ->with('category', 'subcategory')
                           ->firstOrFail();
 
-        $currency = session('currency', 'JOD');
-        $product->display_price = $this->currencyService->convert($product->price, 'JOD', $currency);
+        $currency = session('currency', 'NIS');
+        $product->display_price = $this->currencyService->convert($product->price, 'NIS', $currency);
         $product->display_price_formatted = $this->currencyService->format($product->display_price, $currency);
 
         $relatedProducts = Product::where('category_id', $product->category_id)
@@ -96,7 +96,7 @@ class FrontProductController extends Controller
                                   ->get();
 
         $relatedProducts->transform(function ($product) use ($currency) {
-            $product->display_price = $this->currencyService->convert($product->price, 'JOD', $currency);
+            $product->display_price = $this->currencyService->convert($product->price, 'NIS', $currency);
             $product->display_price_formatted = $this->currencyService->format($product->display_price, $currency);
             return $product;
         });
@@ -139,7 +139,7 @@ class FrontProductController extends Controller
             $cart->items()->create([
                 'product_id' => $product->id,
                 'quantity' => $quantity,
-                'price_at_time' => $product->price, // Store in JOD
+                'price_at_time' => $product->price, // Store in NIS
             ]);
         }
 

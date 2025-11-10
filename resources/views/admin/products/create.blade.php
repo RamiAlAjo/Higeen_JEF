@@ -126,7 +126,7 @@
 
                     <!-- Price -->
                     <div class="mb-3">
-                        <label for="price" class="form-label">Price (USD)</label>
+                        <label for="price" class="form-label">Price (NIS)</label>
                         <input type="number" step="0.01" class="form-control" name="price" value="{{ old('price') }}" min="0" required>
                     </div>
 

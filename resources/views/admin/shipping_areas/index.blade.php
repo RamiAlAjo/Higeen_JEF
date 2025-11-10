@@ -36,7 +36,7 @@
                                     <th>#</th>
                                     <th>Name (EN)</th>
                                     <th>Name (AR)</th>
-                                    <th>Cost (JOD)</th>
+                                    <th>Cost (JNOD)</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>

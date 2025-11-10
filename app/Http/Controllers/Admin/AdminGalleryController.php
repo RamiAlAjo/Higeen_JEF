@@ -32,7 +32,7 @@ class AdminGalleryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'cover_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'cover_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10048',
             'album_name_en' => 'required|string|max:255',
             'album_name_ar' => 'required|string|max:255',
             'album_description_en' => 'nullable|string',
@@ -68,7 +68,7 @@ class AdminGalleryController extends Controller
     public function update(Request $request, Album $gallery)  // ← Changed: $album → $gallery
     {
         $request->validate([
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10048',
             'album_name_en' => 'required|string|max:255',
             'album_name_ar' => 'required|string|max:255',
             'album_description_en' => 'nullable|string',

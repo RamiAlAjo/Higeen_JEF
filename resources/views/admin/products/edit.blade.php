@@ -190,7 +190,7 @@
 
                     <!-- Price -->
                     <div class="mb-3">
-                        <label for="price" class="form-label">Price (USD) <span class="text-danger">*</span></label>
+                        <label for="price" class="form-label">Price (N) <span class="text-danger">*</span></label>
                         <input type="number" step="0.01" class="form-control @error('price') is-invalid @enderror"
                                name="price" value="{{ old('price', $product->price) }}" min="0" required>
                         @error('price')

@@ -128,6 +128,14 @@
                     </ul>
                 </li>
 
+                <!-- Shipping Areas - NEW -->
+                <li class="{{ Route::is('admin.shipping-areas.*') ? 'active' : '' }}">
+                    <a class="sidenav-item-link" href="{{ route('admin.shipping-areas.index') }}" aria-label="Go to Shipping Areas" data-tooltip="Shipping Areas">
+                        <span class="material-symbols-outlined">local_shipping</span>
+                        <span class="nav-text">Shipping Areas</span>
+                    </a>
+                </li>
+
                 <!-- Clients -->
                 <li class="{{ Route::is('admin.clients.*') ? 'active' : '' }}">
                     <a class="sidenav-item-link" href="{{ route('admin.clients.index') }}" aria-label="Go to Clients" data-tooltip="Clients">

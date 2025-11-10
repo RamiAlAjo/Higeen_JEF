@@ -47,7 +47,7 @@ class AdminHeroSectionsController extends Controller
             'button_text_en' => ['nullable', 'string', 'max:255'],
             'button_text_ar' => ['nullable', 'string', 'max:255'],
             'button_link' => ['nullable', 'url', 'max:255'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:10048'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -88,7 +88,7 @@ class AdminHeroSectionsController extends Controller
             'button_text_en' => ['nullable', 'string', 'max:255'],
             'button_text_ar' => ['nullable', 'string', 'max:255'],
             'button_link' => ['nullable', 'url', 'max:255'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:10048'],
         ]);
 
         if ($request->hasFile('image')) {

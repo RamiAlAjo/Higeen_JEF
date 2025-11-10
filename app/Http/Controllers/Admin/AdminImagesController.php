@@ -45,7 +45,7 @@ class AdminImagesController extends Controller
     $request->validate([
         'album_id'       => 'required|exists:albums,id',
         'images'         => 'required|array|min:1',
-        'images.*'       => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+        'images.*'       => 'image|mimes:jpg,jpeg,png,webp|max:10048',
         'images_data'    => 'array',
         'images_data.*.alt' => 'nullable|string|max:255',
         'images_data.*.title_en' => 'nullable|string|max:255',
@@ -118,7 +118,7 @@ class AdminImagesController extends Controller
     {
         $request->validate([
             'album_id' => 'required|exists:albums,id',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10048',
             'alt' => 'nullable|string|max:255',
             'title_en' => 'nullable|string|max:255',
             'title_ar' => 'nullable|string|max:255',

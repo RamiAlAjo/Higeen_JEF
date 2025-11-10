@@ -145,57 +145,58 @@ class AdminProductController extends Controller
                          ->with('success', 'Product updated successfully.');
     }
 
-    public function destroy(Product $product)
-    {
-        $images = $product->image ?? [];
-        if (is_string($images)) {
-            $images = json_decode($images, true) ?: [];
-        }
-        foreach ($images as $imgPath) {
-            $this->deleteImage($imgPath);
-        }
+  public function destroy(Product $product)
+{
+    $images = $product->image ?? [];
 
-        try {
-            $product->delete();
-        } catch (\Exception $e) {
-            Log::error('Product deletion failed: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to delete product: ' . $e->getMessage());
-        }
-
-        return redirect()->route('admin.products.index')
-                         ->with('success', 'Product deleted successfully.');
+    // Ensure it's an array (in case it's stored as JSON string)
+    if (is_string($images)) {
+        $images = json_decode($images, true) ?: [];
     }
+
+    // Delete all images from disk
+    foreach ($images as $imagePath) {
+        $this->deleteImage($imagePath); // Now works correctly
+    }
+
+    try {
+        $product->delete();
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Product deleted successfully.');
+    } catch (\Exception $e) {
+        Log::error('Product deletion failed: ' . $e->getMessage());
+        return redirect()
+            ->back()
+            ->with('error', 'Failed to delete product: ' . $e->getMessage());
+    }
+}
 
     /**
      * Delete a specific image by index.
      */
-    public function destroyImage(Request $request, Product $product)
-    {
-        $request->validate([
-            'image_index' => 'required|integer|min:0',
-        ]);
+   public function destroyImage(Request $request, Product $product)
+{
+    $request->validate(['image_index' => 'required|integer|min:0']);
 
-        $images = $product->image ?? [];
-        if (is_string($images)) {
-            $images = json_decode($images, true) ?: [];
-        }
+    $images = $product->image ?? [];
+    if (is_string($images)) {
+        $images = json_decode($images, true) ?: [];
+    }
 
-        $idx = $request->image_index;
-        if (isset($images[$idx])) {
-            $this->deleteImage($images[$idx]);
-            unset($images[$idx]);
-            // Re-index
-            $images = array_values($images);
-            try {
-                $product->update(['image' => $images]);
-            } catch (\Exception $e) {
-                Log::error('Image deletion failed: ' . $e->getMessage());
-                return redirect()->back()->with('error', 'Failed to delete image: ' . $e->getMessage());
-            }
-        }
+    $idx = $request->image_index;
 
+    if (isset($images[$idx])) {
+        $this->deleteImage($images[$idx]); // Now uses correct path
+        unset($images[$idx]);
+        $images = array_values($images); // Re-index
+
+        $product->update(['image' => $images]);
         return back()->with('success', 'Image deleted successfully.');
     }
+
+    return back()->with('error', 'Image not found.');
+}
 
     /**
      * Upload an individual image to public/uploads/[folder]
@@ -230,16 +231,23 @@ class AdminProductController extends Controller
     /**
      * Delete an image from public folder if it exists.
      */
-    private function deleteImage($path)
-    {
-        // Remove leading slash for consistency
-        $path = ltrim($path, '/');
-        if ($path && File::exists(($path))) {
-            try {
-                File::delete(($path));
-            } catch (\Exception $e) {
-                Log::error('Failed to delete image: ' . $path . ' - ' . $e->getMessage());
-            }
+   /**
+ * Delete an image from public folder if it exists.
+ */
+private function deleteImage($path)
+{
+    if (!$path) return;
+
+    // Normalize path: remove leading slash and prepend public_path
+    $fullPath = public_path(ltrim($path, '/'));
+
+    if (File::exists($fullPath)) {
+        try {
+            File::delete($fullPath);
+            Log::info("Deleted image: {$fullPath}");
+        } catch (\Exception $e) {
+            Log::error("Failed to delete image: {$fullPath} - " . $e->getMessage());
         }
     }
+}
 }

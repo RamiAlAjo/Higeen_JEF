@@ -9,7 +9,7 @@ class CurrencyController extends Controller
 {
     public function change($currency)
     {
-        $validCurrencies = ['JOD', 'NIS', 'USD', 'EUR', 'EGP'];
+        $validCurrencies = ['NIS', 'JOD', 'USD', 'EUR', 'EGP'];
         if (!in_array($currency, $validCurrencies)) {
             return redirect()->back()->with('error', 'Invalid currency selected.');
         }

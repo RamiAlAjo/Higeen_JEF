@@ -114,7 +114,7 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::resource('reports', AdminReportsController::class);
         Route::resource('orders', AdminOrderController::class);
         Route::resource('clients', AdminClientController::class);
-        Route::resource('shipping-areas', AdminShippingAreaController::class);
+        Route::resource('shipping-areas', controller: AdminShippingAreaController::class);
 
         // ✅ Pending count route
 Route::get('/admin/orders/pending-count', [AdminOrderController::class, 'pendingCount'])->name('admin.orders.pending-count');

@@ -902,7 +902,7 @@
                            onclick="toggleLocaleDropdown(event)">
                             <i class="bi bi-globe me-1"></i>
                             <span class="selected-locale">
-                                {{ session('locale', 'en') === 'en' ? 'EN' : 'AR' }} | {{ session('currency', 'JOD') }}
+                                {{ session('locale', 'en') === 'en' ? 'EN' : 'AR' }} | {{ session('currency', 'NIS') }}
                             </span>
                         </a>
                         <ul class="dropdown-menu w-100" aria-labelledby="navbarLocaleDropdownMobile">
@@ -916,7 +916,7 @@
                                 </li>
                             @endforeach
                             <li class="dropdown-header mt-2">{{ __('navbar.currency') }}</li>
-                            @foreach (['JOD', 'NIS', 'USD', 'EUR', 'EGP'] as $currency)
+                            @foreach (['NIS', 'JOD', 'USD', 'EUR', 'EGP'] as $currency)
                                 <li>
                                     <a class="dropdown-item {{ session('currency') === $currency ? 'active' : '' }}"
                                        href="{{ route('change.currency', $currency) }}">
@@ -1010,7 +1010,7 @@
                             <div class="mini-cart-subtotal text-end d-none"></div>
                             <div class="mini-cart-footer">
                                 <a href="{{ route('cart.index') }}" class="btn btn-sm btn-outline-primary">{{ __('navbar.view_cart') }}</a>
-                                <a href="#" class="btn btn-sm btn-primary">{{ __('navbar.checkout') }}</a>
+                                <a href="{{ route('checkout.index') }}"  class="btn btn-sm btn-primary">{{ __('navbar.checkout') }}</a>
                             </div>
                         </div>
                     </div>
@@ -1062,7 +1062,7 @@
                    aria-label="{{ __('navbar.locale_switcher') }}">
                     <i class="bi bi-globe me-1"></i>
                     <span class="selected-locale">
-                        {{ session('locale', 'en') === 'en' ? 'EN' : 'AR' }} | {{ session('currency', 'JOD') }}
+                        {{ session('locale', 'en') === 'en' ? 'EN' : 'AR' }} | {{ session('currency', 'NIS') }}
                     </span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarLocaleDropdown">
@@ -1076,7 +1076,7 @@
                         </li>
                     @endforeach
                     <li class="dropdown-header mt-2">{{ __('navbar.currency') }}</li>
-                    @foreach (['JOD', 'NIS', 'USD', 'EUR', 'EGP'] as $currency)
+                    @foreach (['NIS', 'JOD', 'USD', 'EUR', 'EGP'] as $currency)
                         <li>
                             <a class="dropdown-item {{ session('currency') === $currency ? 'active' : '' }}"
                                href="{{ route('change.currency', $currency) }}">
@@ -1171,7 +1171,7 @@
                     <div class="mini-cart-subtotal text-end d-none"></div>
                     <div class="mini-cart-footer">
                         <a href="{{ route('cart.index') }}" class="btn btn-sm btn-outline-primary">{{ __('navbar.view_cart') }}</a>
-                        <a href="#" class="btn btn-sm btn-primary">{{ __('navbar.checkout') }}</a>
+                        <a href="{{ route('checkout.index') }}" class="btn btn-sm btn-primary">{{ __('navbar.checkout') }}</a>
                     </div>
                 </div>
             </div>

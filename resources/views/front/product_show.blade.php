@@ -158,7 +158,7 @@
         <h1 class="product-title">{{ app()->getLocale() === 'ar' ? $product->product_name_ar : $product->product_name_en }}</h1>
 
         <div class="d-flex align-items-center mb-3">
-          <h3 class="product-price me-3">{{ number_format($product->price, 3) }} JD</h3>
+          <h3 class="product-price me-3">{{ number_format($product->price, 3) }} NIS</h3>
           @if($product->quantity > 0 && $product->quantity <= 10)
             <span class="badge bg-warning text-dark">{{ __('Low Stock!') }}</span>
           @endif
@@ -237,7 +237,7 @@
               <img src="{{ $related->main_image_url }}" class="card-img-top" alt="{{ app()->getLocale() === 'ar' ? $related->product_name_ar : $related->product_name_en }}">
               <div class="card-body">
                 <h5 class="card-title">{{ Str::limit(app()->getLocale() === 'ar' ? $related->product_name_ar : $related->product_name_en, 30) }}</h5>
-                <p class="card-text">{{ number_format($related->price, 3) }} JD</p>
+                <p class="card-text">{{ number_format($related->price, 3) }} NIS</p>
                 <a href="{{ route('front.product-details', $related->id) }}" class="btn btn-sm btn-outline-primary">{{ __('View') }}</a>
               </div>
             </div>

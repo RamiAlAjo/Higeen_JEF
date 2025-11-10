@@ -31,7 +31,11 @@ return new class extends Migration
             $table->string('contact_email')->nullable();
             $table->string('carrers_email')->nullable();
             $table->string('url')->nullable();
-            $table->string('location')->nullable();
+            $table->string('location', 500)->nullable();
+            $table->json('locations')->nullable();
+            $table->decimal('lat', 10, 8)->nullable();
+            $table->decimal('lng', 11, 8)->nullable();
+
             $table->timestamps();
         });
     }
