@@ -2,67 +2,191 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Support\Str;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'product_name_en','product_name_ar','description_en','description_ar',
-        'image','price','status','category_id','subcategory_id','slug','quantity'
+        'product_name_en', 'product_name_ar', 'slug', 'description_en', 'description_ar',
+        'price', 'quantity', 'status', 'featured',
+        'category_id', 'subcategory_id',
+        'images', 'hesabate_id', 'hesabate_class_id',
+        'variants', 'sizes', 'colors'
     ];
 
-    protected $casts = ['image' => 'array'];
+    protected $casts = [
+        'images'    => 'array',
+        'variants'  => 'array',
+        'sizes'     => 'array',
+        'colors'    => 'array',
+        'featured'  => 'boolean',
+        'price'     => 'decimal:4',
+    ];
 
-    // Relationships – Laravel will use the $table from the related models
+    protected $appends = [
+        'main_image',
+        'has_variants',
+        'variant_count',
+        'source',
+        'source_label',
+        'is_from_hesabate'
+    ];
+
+    // =================================================================
+    // ====================== SLUGGABLE ================================
+    // =================================================================
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source'    => 'product_name_en',
+                'unique'    => true,
+                'onUpdate'  => false,
+                'maxLength' => 100,
+            ]
+        ];
+    }
+
+    // =================================================================
+    // ====================== RELATIONSHIPS ============================
+    // =================================================================
     public function category()
     {
-        return $this->belongsTo(ProductCategory::class, 'category_id')->withDefault();
+        return $this->belongsTo(ProductCategory::class)
+                    ->withDefault(['name_en' => 'Uncategorized', 'name_ar' => 'غير مصنف']);
     }
 
     public function subcategory()
     {
-        return $this->belongsTo(ProductSubcategory::class, 'subcategory_id')->withDefault();
+        return $this->belongsTo(ProductSubcategory::class)->withDefault();
     }
 
-    public function cartItems()
+    // =================================================================
+    // ====================== MUTATORS & ACCESSORS ====================
+    // =================================================================
+
+    // Fix: Prevent product_name_en/ar from ever being array (causes Sluggable error)
+    public function getProductNameEnAttribute($value): string
     {
-        return $this->hasMany(CartItem::class);
+        return is_array($value) ? ($value[0] ?? '') : (string) $value;
     }
 
-    public function getMainImageUrlAttribute()
+    public function getProductNameArAttribute($value): string
     {
-        return $this->image && count($this->image)
-            ? asset($this->image[0])
-            : asset('images/default.png');
+        return is_array($value) ? ($value[0] ?? '') : (string) $value;
     }
 
-    public function getGalleryImagesAttribute()
+    public function setProductNameEnAttribute($value): void
     {
-        return $this->image ?? [];
+        $this->attributes['product_name_en'] = is_array($value) ? ($value[0] ?? '') : (string) $value;
     }
 
+    public function setProductNameArAttribute($value): void
+    {
+        $this->attributes['product_name_ar'] = is_array($value) ? ($value[0] ?? '') : (string) $value;
+    }
+
+    // Main Image (safe & always returns valid URL)
+    public function getMainImageAttribute(): string
+    {
+        $images = $this->images ?? [];
+        return is_array($images) && count($images) > 0 && !empty($images[0])
+            ? asset($images[0])
+            : asset('images/default-product.png');
+    }
+
+    public function getGalleryAttribute(): array
+    {
+        $images = $this->images ?? [];
+        return collect($images)->map(fn($img) => asset($img))->all();
+    }
+
+    // Variants
+    public function getHasVariantsAttribute(): bool
+    {
+        return !empty($this->variants);
+    }
+
+    public function getVariantCountAttribute(): int
+    {
+        return count($this->variants ?? []);
+    }
+
+    public function getAvailableSizesAttribute(): array
+    {
+        return $this->sizes ?? [];
+    }
+
+    public function getAvailableColorsAttribute(): array
+    {
+        return $this->colors ?? [];
+    }
+
+    // =================================================================
+    // ====================== SOURCE DETECTION =========================
+    // =================================================================
+    public function getIsFromHesabateAttribute(): bool
+    {
+        return !empty($this->hesabate_id);
+    }
+
+    public function getSourceAttribute(): string
+    {
+        return $this->is_from_hesabate ? 'hesabate_api' : 'manual';
+    }
+
+    public function getSourceLabelAttribute(): string
+    {
+        return $this->is_from_hesabate ? 'Hesabate' : 'Manual';
+    }
+
+    public function getSourceBadgeAttribute(): string
+    {
+        return $this->is_from_hesabate
+            ? '<span class="badge bg-info text-white"><i class="fas fa-cloud"></i> Hesabate</span>'
+            : '<span class="badge bg-secondary"><i class="fas fa-user-edit"></i> Manual</span>';
+    }
+
+    // =================================================================
+    // ====================== SCOPES ===================================
+    // =================================================================
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active')->where('quantity', '>', 0);
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('featured', true);
+    }
+
+    public function scopeInStock($query)
+    {
+        return $query->where('quantity', '>', 0);
+    }
+
+    // =================================================================
+    // ====================== BOOT =====================================
+    // =================================================================
     protected static function boot()
     {
         parent::boot();
 
-        static::creating(function ($p) {
-            if (empty($p->slug)) {
-                $base = Str::slug($p->product_name_en);
-                $count = static::where('slug', 'like', $base.'%')->count();
-                $p->slug = $count ? "$base-$count" : $base;
+        static::saving(function ($product) {
+            // Auto-calculate total quantity from variants
+            if (!empty($product->variants) && is_array($product->variants)) {
+                $total = collect($product->variants)->sum('current_amount');
+                $product->quantity = $total > 0 ? $total : 0;
             }
-        });
 
-        static::updating(function ($p) {
-            if ($p->isDirty('product_name_en') && empty($p->slug)) {
-                $base = Str::slug($p->product_name_en);
-                $count = static::where('slug', 'like', $base.'%')->count();
-                $p->slug = $count ? "$base-$count" : $base;
-            }
+            // Auto-update status based on stock
+            $product->status = $product->quantity > 0 ? 'active' : 'inactive';
         });
     }
 }

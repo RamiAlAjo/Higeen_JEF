@@ -1,251 +1,551 @@
 @extends('front.layouts.app')
 
 @section('content')
-
 <x-hero-section-component page="products.index"/>
 
 <style>
-  /* Page Title */
-  .section-title {
-    color: #8b3a2b;
-    font-weight: 700;
-    margin-bottom: 25px;
-  }
+    :root {
+        --brand: #8b3a2b;
+        --brand-dark: #6d2e22;
+        --brand-light: #a55847;
+        --gray-100: #f8f9fa;
+        --gray-200: #e9ecef;
+        --gray-600: #6c757d;
+        --gray-800: #343a40;
+        --success: #2d8b52;
+        --radius: 18px;
+        --shadow-sm: 0 8px 25px rgba(0,0,0,0.08);
+        --shadow-lg: 0 25px 50px rgba(139,58,43,0.18);
+        --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-  /* Product Card - GRID VIEW */
-  .product-card {
-    border: 1px solid #ddd;
-    padding-top: 20px;
-    text-align: center;
-    transition: all 0.3s ease-in-out;
-    background: #fff;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
+    .products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
 
-  .product-card:hover {
-    border-color: #2e3a59;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  }
+    .section-title {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: var(--gray-800);
+        margin: 0;
+        letter-spacing: -0.8px;
+    }
 
-  .product-img {
-    max-height: 200px;
-    object-fit: contain;
-    margin-bottom: 12px;
-    transition: transform 0.3s ease-in-out;
-    max-width: -webkit-fill-available;
-  }
+    .results-count {
+        color: var(--gray-600);
+        font-weight: 500;
+        font-size: 1.05rem;
+    }
 
-  .product-card:hover .product-img {
-    transform: scale(1.05);
-  }
+    /* View Toggle */
+    .view-toggle {
+        background: white;
+        border: 2px solid var(--brand);
+        border-radius: 50px;
+        overflow: hidden;
+        display: inline-flex;
+        box-shadow: var(--shadow-sm);
+    }
 
-  .product-title {
-    font-size: 0.95rem;
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: #222;
-    min-height: 38px;
-  }
+    .view-btn {
+        padding: 14px 32px;
+        border: none;
+        background: transparent;
+        color: var(--brand);
+        font-weight: 700;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        cursor: pointer;
+    }
 
-  .product-description {
-    font-size: 0.8rem;
-    color: #666;
-    margin-bottom: 10px;
-    line-height: 1.4;
-    flex-grow: 1;
-  }
+    .view-btn.active {
+        background: var(--brand);
+        color: white;
+    }
 
-  .read-more {
-    color: #8b3a2b;
-    font-size: 0.8rem;
-    font-weight: 500;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 6px;
-    transition: color 0.2s ease;
-  }
+    .view-btn:hover:not(.active) {
+        background: rgba(139, 58, 43, 0.1);
+    }
 
-  .read-more:hover {
-    color: #a04637;
-    text-decoration: underline;
-  }
+    /* Products Container */
+    #productsContainer {
+        transition: all 0.6s ease;
+    }
 
-  .price {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: auto;
-    padding: 8px 0;
-  }
+    .grid-view {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 32px;
+    }
 
-  /* Cart Button */
-  .add-to-cart {
-    display: none;
-    width: 100%;
-    background: #2e3a59;
-    color: #fff;
-    padding: 10px 0;
-    font-size: 0.9rem;
-    border: none;
-    border-radius: 2px;
-    transition: background 0.3s;
-    margin-top: auto;
-  }
+    .list-view {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
 
-  .product-card:hover .add-to-cart {
-    display: block;
-  }
+    /* Product Card */
+    .product-card {
+        background: white;
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
 
-  .add-to-cart:hover {
-    background: #1c243a;
-  }
+    .product-card:hover {
+        transform: translateY(-14px);
+        box-shadow: var(--shadow-lg);
+    }
 
-  @media (max-width: 768px) {
-    .add-to-cart { display: block; }
-  }
+    .product-img-wrapper {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #fdfbfb, #f5f5f5);
+    }
 
-  /* Sidebar */
-  .sidebar { padding-left: 20px; border-left: 1px solid #ddd; }
-  .sidebar h5 { color: #8b3a2b; font-weight: 600; margin-bottom: 15px; }
-  .sidebar ul { list-style: none; padding-left: 0; }
-  .sidebar ul li { margin-bottom: 8px; }
-  .sidebar ul li.active { color: #8b3a2b; font-weight: bold; }
-  .sidebar .search-box input { border: 1px solid #8b3a2b; }
-  .sidebar .search-box button { background: none; border: none; color: #8b3a2b; }
+    .product-img {
+        width: 100%;
+        height: 270px;
+        object-fit: contain;
+        padding: 30px;
+        transition: transform 0.7s ease;
+    }
 
-  /* Best Sellers & Pagination */
-  .best-seller { display: flex; align-items: center; margin-bottom: 12px; }
-  .best-seller img { width: 40px; height: 40px; object-fit: contain; margin-right: 10px; }
-  .best-seller span { font-size: 0.9rem; line-height: 1.2; }
-  .pagination .page-link { border: none; color: #8b3a2b; }
-  .pagination .active .page-link { background: #8b3a2b; color: #fff; border-radius: 3px; }
+    .product-card:hover .product-img {
+        transform: scale(1.15);
+    }
+
+    .badge-new {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        background: var(--brand);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        z-index: 2;
+    }
+
+    .product-card-content {
+        padding: 26px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-title {
+        font-size: 1.28rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 12px;
+        line-height: 1.3;
+    }
+
+    .product-description {
+        font-size: 0.96rem;
+        color: var(--gray-600);
+        line-height: 1.65;
+        flex-grow: 1;
+        margin-bottom: 16px;
+    }
+
+    .price {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--brand);
+        margin: 14px 0;
+    }
+
+    .add-to-cart {
+        background: var(--brand);
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-top: auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .add-to-cart:hover {
+        background: var(--brand-dark);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(139, 58, 43, 0.35);
+    }
+
+    .add-to-cart.loading::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border: 3px solid transparent;
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        inset: 0;
+        margin: auto;
+    }
+
+    .add-to-cart.added {
+        background: var(--success);
+    }
+
+    /* List Mode */
+    .product-card.list-mode {
+        flex-direction: row;
+        padding: 24px;
+        gap: 30px;
+        align-items: center;
+    }
+
+    .product-card.list-mode .product-img-wrapper {
+        flex: 0 0 240px;
+        height: 240px;
+    }
+
+    .product-card.list-mode .product-img {
+        height: 100%;
+        padding: 20px;
+    }
+
+    .product-card.list-mode .add-to-cart {
+        min-width: 190px;
+        padding: 16px 36px;
+    }
+
+    /* Pagination – Perfect #8b3a2b */
+    .pagination {
+        justify-content: center;
+        margin-top: 4rem;
+        gap: 10px;
+    }
+
+    .page-item .page-link {
+        color: var(--brand);
+        background: white;
+        border: 2px solid transparent;
+        border-radius: 50px !important;
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.05rem;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    }
+
+    .page-item .page-link:hover {
+        background: rgba(139, 58, 43, 0.12);
+        border-color: var(--brand);
+        color: var(--brand);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(139, 58, 43, 0.2);
+    }
+
+    .page-item.active .page-link {
+        background: var(--brand) !important;
+        color: white !important;
+        border-color: var(--brand) !important;
+        box-shadow: 0 12px 30px rgba(139, 58, 43, 0.35);
+        transform: translateY(-4px);
+    }
+
+    .page-item:first-child .page-link,
+    .page-item:last-child .page-link {
+        font-size: 1.5rem;
+        color: var(--brand);
+    }
+
+    .page-item:first-child .page-link:hover,
+    .page-item:last-child .page-link:hover {
+        background: var(--brand);
+        color: white;
+    }
+
+    .page-item.disabled .page-link {
+        color: #aaa;
+        background: #f5f5f5;
+        cursor: not-allowed;
+    }
+
+    /* Sidebar */
+    .sidebar-card {
+        background: white;
+        padding: 28px;
+        border-radius: var(--radius);
+        margin-bottom: 28px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(139, 58, 43, 0.08);
+    }
+
+    .sidebar-card h5 {
+        color: var(--brand);
+        font-weight: 800;
+        font-size: 1.35rem;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 3px solid var(--brand);
+        display: inline-block;
+    }
+
+    .sidebar-card ul li a {
+        display: block;
+        padding: 14px 18px;
+        color: var(--gray-800);
+        font-weight: 500;
+        border-radius: 12px;
+        transition: var(--transition);
+    }
+
+    .sidebar-card ul li a:hover,
+    .sidebar-card ul li.active a {
+        background: rgba(139, 58, 43, 0.12);
+        color: var(--brand);
+        font-weight: 700;
+        padding-left: 24px;
+    }
+
+    .best-seller {
+        display: flex;
+        align-items: center;
+        padding: 18px;
+        border-radius: 16px;
+        transition: var(--transition);
+        border: 1px solid var(--gray-200);
+    }
+
+    .best-seller:hover {
+        border-color: var(--brand);
+        background: rgba(139, 58, 43, 0.06);
+        transform: translateY(-4px);
+    }
+
+    .best-seller img {
+        width: 74px;
+        height: 74px;
+        object-fit: contain;
+        border-radius: 14px;
+        margin-right: 18px;
+        border: 2px solid var(--gray-200);
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 992px) {
+        .grid-view { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+        .products-header { flex-direction: column; text-align: center; }
+        .section-title { font-size: 2rem; }
+        .grid-view { grid-template-columns: 1fr 1fr; gap: 24px; }
+        .product-card.list-mode { flex-direction: column; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+        .grid-view { grid-template-columns: 1fr; }
+        .page-item .page-link { width: 44px; height: 44px; font-size: 0.95rem; }
+    }
 </style>
 
-<div class="container py-5 bg-light">
-    <h2 class="section-title">Products</h2>
+<div class="container py-5">
+    <div class="products-header">
+        <div>
+            <h2 class="section-title">Our Collection</h2>
+            <p class="results-count">{{ $products->total() }} exquisite products</p>
+        </div>
+
+        <div class="view-toggle">
+            <button class="view-btn active" data-view="grid">Grid</button>
+            <button class="view-btn" data-view="list">List</button>
+        </div>
+    </div>
 
     <div class="row">
-        <!-- Product Grid -->
+        <!-- Products -->
         <div class="col-lg-9">
-            <div class="row g-4" id="productsContainer">
+            <div id="productsContainer" class="grid-view">
                 @foreach ($products as $product)
-                    <div class="col-md-4 col-sm-6 d-flex">
-                        <article class="product-card w-100">
-                            <a href="{{ route('front.product-details', ['id' => $product->id]) }}" style="text-decoration: none; color: inherit;">
-                                <img
-                                    src="{{ $product->image && is_array($product->image) && !empty($product->image) ? asset($product->image[0]) : asset('Uploads/default.jpg') }}"
-                                    class="product-img"
-                                    alt="{{ $product->product_name_en ?? 'Unnamed Product' }}"
-                                >
-                                <div class="product-card-content px-3">
-                                    <h6 class="product-title">{{ $product->product_name_en ?? 'Unnamed Product' }}</h6>
+                    <article class="product-card" data-id="{{ $product->id }}">
+                        @if($product->is_new ?? false)
+                            <span class="badge-new">NEW</span>
+                        @endif
 
-                                    <p class="product-description">
-                                        {{ Str::limit($product->description_en ?? 'No description available.', 120) }}
-                                    </p>
+                        <a href="{{ route('front.product-details', $product->id) }}" class="text-decoration-none">
+                            <div class="product-img-wrapper">
+                                <img src="{{ $product->image && is_array($product->image) ? asset($product->image[0]) : asset('Uploads/default.jpg') }}"
+                                     class="product-img"
+                                     alt="{{ $product->product_name_en }}">
+                            </div>
+                        </a>
 
-                                    @if(strlen($product->description_en ?? '') > 120)
-                                        <a href="{{ route('front.product-details', ['id' => $product->id]) }}" class="read-more">
-                                            Read more
-                                        </a>
-                                    @endif
-                                </div>
+                        <div class="product-card-content">
+                            <a href="{{ route('front.product-details', $product->id) }}" class="text-decoration-none text-dark">
+                                <h3 class="product-title">{{ $product->product_name_en }}</h3>
+                                <p class="product-description">
+                                    {{ Str::limit($product->description_en ?? 'Handcrafted with premium materials and timeless design.', 110) }}
+                                </p>
                             </a>
 
-                            <p class="price">{{ $product->display_price_formatted }} {{ $currency }}</p>
+                            <div class="price">{{ $product->display_price_formatted }} {{ $currency }}</div>
 
-                            <button class="add-to-cart"
-                                    data-product-id="{{ $product->id }}"
-                                    onclick="addToCart({{ $product->id }})">
-                                ADD TO CART <i class="fas fa-shopping-cart ms-1"></i>
+                            <button class="add-to-cart w-100"
+                                    onclick="event.preventDefault(); addToCart(this, {{ $product->id }})">
+                                Add to Cart
                             </button>
-                        </article>
-                    </div>
+                        </div>
+                    </article>
                 @endforeach
             </div>
 
-            <!-- Pagination -->
-            <nav class="mt-4">
-                {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+            <!-- Beautiful #8b3a2b Pagination -->
+            <nav aria-label="Products pagination">
+                {{ $products->appends(request()->query())->links() }}
             </nav>
         </div>
 
-        <!-- Sidebar -->
-        <div class="col-lg-3 sidebar">
-            <h5>Categories</h5>
-            <ul>
-                @foreach ($categories as $category)
-                    <li class="{{ request()->query('category') == $category->id ? 'active' : '' }}">
-                        <a href="{{ route('front.product', ['category' => $category->id]) }}">{{ $category->name_en }}</a>
+        <!-- Luxury Sidebar -->
+        <div class="col-lg-3">
+            <div class="sidebar-card">
+                <h5>Categories</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="{{ !request()->has('category') ? 'active' : '' }}">
+                        <a href="{{ route('front.product') }}">All Products</a>
                     </li>
+                    @foreach ($categories as $category)
+                        <li class="{{ request()->get('category') == $category->id ? 'active' : '' }}">
+                            <a href="{{ route('front.product', ['category' => $category->id]) }}">{{ $category->name_en }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+
+            @if($subcategories->count() > 0)
+            <div class="sidebar-card">
+                <h5>Subcategories</h5>
+                <ul class="list-unstyled mb-0">
+                    @foreach ($subcategories as $subcategory)
+                        <li class="{{ request()->get('subcategory') == $subcategory->id ? 'active' : '' }}">
+                            <a href="{{ route('front.product', ['subcategory' => $subcategory->id]) }}">{{ $subcategory->name_en }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+
+            <div class="sidebar-card">
+                <h5>Search Collection</h5>
+                <form action="{{ route('front.product') }}" method="GET" class="d-flex">
+                    <input type="text" name="search" class="form-control me-2" placeholder="Search..." value="{{ request()->get('search') }}">
+                    <button type="submit" class="btn btn-outline-danger border-2 fw-bold">Go</button>
+                </form>
+            </div>
+
+            <div class="sidebar-card">
+                <h5>Best Sellers</h5>
+                @foreach ($bestSellers as $bestSeller)
+                    <div class="best-seller mb-3">
+                        <img src="{{ $bestSeller->image && is_array($bestSeller->image) ? asset($bestSeller->image[0]) : asset('Uploads/default.jpg') }}"
+                             alt="{{ $bestSeller->product_name_en }}">
+                        <div>
+                            <div class="fw-bold text-dark">{{ $bestSeller->product_name_en }}</div>
+                            <div class="text-danger fw-bold">{{ $bestSeller->display_price_formatted }} {{ $currency }}</div>
+                        </div>
+                    </div>
                 @endforeach
-            </ul>
-
-            <h5 class="mt-4">Subcategories</h5>
-            <ul>
-                @foreach ($subcategories as $subcategory)
-                    <li class="{{ request()->query('subcategory') == $subcategory->id ? 'active' : '' }}">
-                        <a href="{{ route('front.product', ['subcategory' => $subcategory->id]) }}">{{ $subcategory->name_en }}</a>
-                    </li>
-                @endforeach
-            </ul>
-
-            <h5 class="mt-4">Search</h5>
-            <form action="{{ route('front.product') }}" method="GET" class="search-box input-group">
-                <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ request()->query('search') }}">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
-                <a href="{{ route('front.product') }}" class="btn btn-secondary"><i class="fas fa-times"></i></a>
-            </form>
-
-            <h5 class="mt-4">Best Sellers</h5>
-            @foreach ($bestSellers as $bestSeller)
-                <div class="best-seller">
-                    <img src="{{ $bestSeller->image && is_array($bestSeller->image) && !empty($bestSeller->image) ? asset($bestSeller->image[0]) : asset('Uploads/default.jpg') }}"
-                         alt="{{ $bestSeller->product_name_en ?? 'Unnamed Product' }}">
-                    <span>{{ $bestSeller->product_name_en ?? 'Unnamed Product' }}<br>{{ $bestSeller->display_price_formatted }} {{ $currency }}</span>
-                </div>
-            @endforeach
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    function addToCart(productId) {
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('productsContainer');
+        const viewBtns = document.querySelectorAll('.view-btn');
+        const savedView = localStorage.getItem('productView') || 'grid';
+
+        container.className = savedView + '-view';
+        document.querySelector(`[data-view="${savedView}"]`).classList.add('active');
+
+        viewBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const view = this.dataset.view;
+                container.className = view + '-view';
+                viewBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                localStorage.setItem('productView', view);
+
+                document.querySelectorAll('.product-card').forEach(card => {
+                    card.classList.toggle('list-mode', view === 'list');
+                });
+            });
+        });
+
+        if (savedView === 'list') {
+            document.querySelectorAll('.product-card').forEach(c => c.classList.add('list-mode'));
+        }
+    });
+
+    function addToCart(button, productId) {
+        const original = button.innerHTML;
+        button.classList.add('loading');
+        button.disabled = true;
+        button.innerHTML = '';
+
         fetch('{{ route('cart.add') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
             },
-            body: JSON.stringify({ product_id: productId, quantity: 1 }),
+            body: JSON.stringify({ product_id: productId, quantity: 1 })
         })
-        .then(response => {
-            if (!response.ok) throw new Error('Network error');
-            return response.json();
-        })
+        .then(r => r.ok ? r.json() : Promise.reject())
         .then(data => {
-            alert(data.message);
-            updateCartBadge(data.cart_count);
+            button.classList.remove('loading');
+            button.classList.add('added');
+            button.innerHTML = 'Added!';
+            updateCartBadge(data.cart_count || 0);
+
+            setTimeout(() => {
+                button.classList.remove('added');
+                button.innerHTML = original;
+                button.disabled = false;
+            }, 2000);
         })
-        .catch(() => alert('Failed to add product to cart.'));
+        .catch(() => {
+            button.classList.remove('loading');
+            button.innerHTML = original;
+            button.disabled = false;
+            alert('Failed to add to cart');
+        });
     }
 
     function updateCartBadge(count) {
         document.querySelectorAll('.cart-badge').forEach(badge => {
             badge.textContent = count;
-            badge.style.display = count > 0 ? 'block' : 'none';
+            badge.style.display = count > 0 ? 'inline-block' : 'none';
         });
-
-        if (count > 0 && !document.querySelector('.cart-badge')) {
-            document.querySelectorAll('.nav-cart .bi-cart').forEach(icon => {
-                const badge = document.createElement('span');
-                badge.className = 'cart-badge';
-                badge.textContent = count;
-                icon.parentElement.appendChild(badge);
-            });
-        }
     }
 </script>
-
 @endsection

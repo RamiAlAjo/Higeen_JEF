@@ -1100,13 +1100,18 @@
                    data-bs-placement="{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}"
                    title="{{ auth('client')->check() ? auth('client')->user()->name : __('navbar.account') }}">
                     @if (auth('client')->check() && auth('client')->user()->avatar)
-                        <img src="{{ asset(auth('client')->user()->avatar) }}"
-                             alt="{{ auth('client')->user()->name }}"
-                             class="rounded-circle"
-                             width="32"
-                             height="32"
-                             style="object-fit: cover;"
-                             loading="lazy">
+                       @if (auth('client')->check() && auth('client')->user()->avatar)
+                        <img src="{{ asset('storage/' . auth('client')->user()->avatar) }}"
+                            alt="{{ auth('client')->user()->name }}"
+                            class="rounded-circle"
+                            width="32"
+                            height="32"
+                            style="object-fit: cover;"
+                            loading="lazy">
+                    @else
+                        <i class="bi bi-person-circle fs-4"></i>
+                    @endif
+
                     @else
                         <i class="bi bi-person-circle fs-4"></i>
                     @endif

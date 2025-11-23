@@ -5,8 +5,8 @@
 
       <!-- Logo + tagline + social media -->
       <div class="col-md-4 mb-4 mb-md-0 text-center text-md-start">
-        <img src="{{ asset('Logo.svg') }}" alt="{{ __('footer.company_logo_alt') }}" class="mb-2" style="max-width: 200px;">
-        <p class="small mb-2 mb-md-3">{{ __('footer.company_tagline') }}</p>
+        <img src="{{ asset('Logo.svg') }}" alt="{{ __('footer.company_logo_alt') }}" class="mb-2" style="max-width: 250px;">
+        {{-- <p class="small mb-2 mb-md-3">{{ __('footer.company_tagline') }}</p> --}}
 
         <!-- Social Media Icons -->
         <div class="d-flex justify-content-center justify-content-md-start gap-3">
@@ -20,34 +20,34 @@
       <!-- Quick Links -->
       <div class="col-md-4 mb-4 mb-md-0 text-center text-md-start">
         <h5 class="ABOUT-footer-title">{{ __('footer.quick_links') }}</h5>
-        <ul class="list-unstyled">
+        <ul class="list-unstyled" style="font-size: large;">
           <a href="{{ route('front.homepage') }}" class="nav-link NAVBAR-link-Footer {{ Route::is('front.homepage') ? 'active' : '' }}">{{ __('footer.home') }}</a>
-          <a href="{{ route('front.about') }}" class="nav-link NAVBAR-link-Footer {{ Route::is('front.about') ? 'active' : '' }}">{{ __('footer.about_us') }}</a>
-          <a href="{{ route('front.product') }}" class="nav-link NAVBAR-link-Footer {{ Route::is('front.product') ? 'active' : '' }}">{{ __('footer.products') }}</a>
-          <a href="{{ route('front.gallery') }}" class="nav-link NAVBAR-link-Footer {{ Route::is('front.gallery') ? 'active' : '' }}">{{ __('footer.gallery') }}</a>
-          <a href="{{ route('front.contact') }}" class="nav-link NAVBAR-link-Footer {{ Route::is('front.contact') ? 'active' : '' }}">{{ __('footer.contact') }}</a>
+          <a href="{{ route('front.about') }}" class="nav-link NAVBAR-link-Footer mb-1{{ Route::is('front.about') ? 'active' : '' }}">{{ __('footer.about_us') }}</a>
+          <a href="{{ route('front.product') }}" class="nav-link NAVBAR-link-Footer mb-1 {{ Route::is('front.product') ? 'active' : '' }}">{{ __('footer.products') }}</a>
+          <a href="{{ route('front.gallery') }}" class="nav-link NAVBAR-link-Footer  mb-1{{ Route::is('front.gallery') ? 'active' : '' }}">{{ __('footer.gallery') }}</a>
+          <a href="{{ route('front.contact') }}" class="nav-link NAVBAR-link-Footer mb-1{{ Route::is('front.contact') ? 'active' : '' }}">{{ __('footer.contact') }}</a>
         </ul>
       </div>
 
      <!-- Contact Us -->
       <div class="col-md-4 text-center text-md-start">
         <h5 class="ABOUT-footer-title">{{ __('footer.contact_us') }}</h5>
-        <ul class="list-unstyled">
+        <ul class="list-unstyled" style="font-size: large;">
           <!-- Phone: Safe array handling -->
           <li>
-            <i class="bi bi-telephone-fill me-2"></i>
+            <i class="bi bi-telephone-fill me-2 mb-1"></i>
             {{ is_array($globalsettings->phone) ? implode(' | ', array_filter($globalsettings->phone)) : ($globalsettings->phone ?? '+962 79112559') }}
           </li>
 
           <!-- Email -->
           <li>
-            <i class="bi bi-envelope-fill me-2"></i>
+            <i class="bi bi-envelope-fill me-2 mb-1"></i>
             {{ $globalsettings->email ?? 'info@hospital.com' }}
           </li>
 
           <!-- Address -->
           <li>
-            <i class="bi bi-geo-alt-fill me-2"></i>
+            <i class="bi bi-geo-alt-fill me-2 mb-1"></i>
             {{ $globalsettings->address ?? 'عمان - الأردن' }}
           </li>
         </ul>
@@ -58,7 +58,7 @@
   <div class="ABOUT-footer-bottom mt-4 py-2 px-3" style="width: 280px;">
     <div class="d-flex align-items-center">
       <span class="me-3 text-white fw-bold">{{ __('footer.authorized_distributor') }}</span>
-      <img src="{{ asset('Logo_2.svg') }}" alt="{{ __('footer.distributor_logo_alt') }}" style="height: 30px;">
+      <img src="{{ asset('Logo_2.svg') }}" alt="{{ __('footer.distributor_logo_alt') }}" style="height: 30px;" class="mb-2">
     </div>
   </div>
 </footer>

@@ -115,6 +115,8 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::resource('orders', AdminOrderController::class);
         Route::resource('clients', AdminClientController::class);
         Route::resource('shipping-areas', controller: AdminShippingAreaController::class);
+      Route::post('orders/hesabate-sent', [AdminOrderController::class, 'markHesabateSent'])
+            ->name('orders.hesabate.sent');
 
         // ✅ Pending count route
 Route::get('/admin/orders/pending-count', [AdminOrderController::class, 'pendingCount'])->name('admin.orders.pending-count');
@@ -141,6 +143,13 @@ Route::get('/admin/orders/pending-count', [AdminOrderController::class, 'pending
             ->name('reports.payers_by_gender.excel');
         Route::get('/reports/sales-by-category/excel/{limit?}', [AdminReportsController::class, 'exportSalesByCategoryExcel'])
             ->name('reports.sales_by_category.excel');
+
+
+    // Route::resource('products', AdminProductController::class);
+
+        // This must be INSIDE the group!
+        Route::post('/products/import', [AdminProductController::class, 'import'])
+            ->name('products.import');
     });
 
 // ✅ Include default auth routes

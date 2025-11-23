@@ -1,809 +1,344 @@
+{{-- resources/views/admin/settings/index.blade.php --}}
 @extends('admin.layouts.app')
 
+@section('title', 'Website Settings')
+
 @section('content')
-
 <style>
-    /* Enhanced Design */
     :root {
-        --primary-color: #9e6de0;
+        --primary: #9e6de0;
         --primary-dark: #7b52b3;
-        --text-color: #1a1a1a;
-        --background-light: #f8f9fa;
-    }
-
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: var(--background-light);
+        --brown: #8B3A2B;
+        --text: #1a1a1a;
+        --light: #f8f9fa;
+        --border: #dee2e6;
     }
 
     .settings-card {
-        border-radius: 16px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        background: linear-gradient(145deg, #ffffff, #f9fafb);
-        margin-bottom: 2rem;
-        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+        background: #fff;
+        max-width: 1200px;
+        margin: 2rem auto;
     }
 
-    .settings-card .card-header {
-        background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+    .card-header {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: white;
-        border-radius: 16px 16px 0 0;
-        padding: 1.75rem;
+        padding: 2rem;
+        font-size: 1.6rem;
+        font-weight: 700;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-    }
-
-    .form-section {
-        margin-bottom: 2.5rem;
-        padding: 1.5rem;
-        border-bottom: 1px solid #e9ecef;
+        gap: 14px;
     }
 
     .accordion-button {
         font-weight: 600;
-        color: var(--text-color);
-        background-color: #f1f3f5;
-        border-radius: 10px !important;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        background: #f8f9fa;
+        border-radius: 14px !important;
+        padding: 1.3rem 1.6rem;
+        font-size: 1.1rem;
     }
-
     .accordion-button:not(.collapsed) {
-        background-color: var(--primary-color);
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: white;
+        box-shadow: 0 10px 30px rgba(158,109,224,0.35);
     }
 
-    .accordion-button::after {
-        font-family: 'Font Awesome 6 Free';
-        content: '\f078';
-        font-weight: 900;
+    /* Perfect Social Icons — Always Visible */
+    .social-input {
+        position: relative;
+        margin-bottom: 1.4rem;
     }
-
-    .accordion-button:not(.collapsed)::after {
-        content: '\f077';
-    }
-
-    .form-group label {
-        font-weight: 600;
-        margin-bottom: 0.75rem;
-        color: var(--text-color);
-    }
-
-    .form-control, .form-control-file {
-        border-radius: 10px;
-        border: 1px solid #ced4da;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .form-control:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 8px rgba(158, 109, 224, 0.3);
-    }
-
-    .form-control.is-valid {
-        border-color: #28a745;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right calc(0.375em + 0.1875rem) center;
-        background-size: 1rem;
-    }
-
-    .btn-pill {
-        border-radius: 50px;
-        padding: 0.75rem 2rem;
-        font-weight: 500;
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        color: white;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .btn-pill:hover {
-        background-color: var(--primary-dark);
-        border-color: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .input-group-text {
-        background-color: #e9ecef;
-        border-radius: 10px 0 0 10px;
-        color: var(--text-color);
-    }
-
-    .logo-preview img {
-        border: 2px solid #dee2e6;
-        border-radius: 12px;
-        padding: 8px;
-        background-color: #fff;
-        max-width: 200px;
-        transition: opacity 0.3s ease;
-    }
-
-    .logo-dropzone {
-        border: 2px dashed #ced4da;
-        border-radius: 12px;
-        padding: 2rem;
-        text-align: center;
-        background-color: #f8f9fa;
-        cursor: pointer;
-        transition: border-color 0.3s ease;
-    }
-
-    .logo-dropzone:hover, .logo-dropzone.dragover {
-        border-color: var(--primary-color);
-        background-color: rgba(158, 109, 224, 0.1);
-    }
-
-    .form-buttons {
+    .social-icon {
+        position: absolute;
+        left: 0; top: 0;
+        width: 56px; height: 56px;
+        border-radius: 14px 0 0 14px;
         display: flex;
-        gap: 1.5rem;
-        justify-content: flex-end;
-        position: sticky;
-        bottom: 0;
-        background: #fff;
-        padding: 1rem;
-        border-top: 1px solid #e9ecef;
-        border-radius: 0 0 16px 16px;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        z-index: 10;
     }
+    .social-icon.facebook   { background: #1877f2; }
+    .social-icon.instagram  { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+    .social-icon.twitter    { background: #000000; }
+    .social-icon.youtube    { background: #ff0000; }
+    .social-icon.linkedin   { background: #0a66c2; }
+    .social-icon.pinterest  { background: #e60023; }
+    .social-icon.tiktok     { background: #000000; }
+
+    .social-input input {
+        padding-left: 74px !important;
+        height: 56px;
+        border-radius: 14px;
+        border: 1.5px solid var(--border);
+    }
+    .social-input input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(158,109,224,0.25);
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border: none;
+        border-radius: 50px;
+        padding: 1rem 3rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: white;
+    }
+    .btn-save:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(158,109,224,0.45); }
 
     .loading-overlay {
         display: none;
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.95);
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        border-radius: 16px;
+        inset: 0;
+        background: rgba(255,255,255,0.98);
+        z-index: 9999;
+        border-radius: 20px;
+        backdrop-filter: blur(8px);
     }
-
-    .loading-overlay .spinner-border {
-        width: 4rem;
-        height: 4rem;
-        border-width: 0.4em;
-        color: var(--primary-color);
-    }
-
-    .alert {
-        border-radius: 10px;
-        margin-bottom: 1.5rem;
-        animation: fadeIn 0.5s ease;
-    }
-
-    .icon-fallback {
-        display: 0.9rem;
-        color: #6c757d;
-    }
-
-    :root:not([data-fontawesome-loaded]) .icon-fallback {
-        display: inline-block !important;
-    }
-
-    :root:not([data-fontawesome-loaded]) .fa,
-    :root:not([data-fontawesome-loaded]) .fas,
-    :root:not([data-fontawesome-loaded]) .fab {
-        display: none !important;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-        .form-buttons {
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .btn-pill {
-            width: 100%;
-        }
-        .logo-preview img {
-            max-width: 100%;
-        }
-        .form-section {
-            padding: 1rem;
-        }
-    }
-
-    /* Accessibility */
-    .form-control:focus,
-    .accordion-button:focus {
-        outline: 2px solid var(--primary-color);
-        outline-offset: 2px;
-    }
-
-    /* Custom Tooltip */
-    .custom-tooltip .tooltip-inner {
-        background-color: var(--primary-dark);
-        color: white;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-    }
-
-    .custom-tooltip .tooltip-arrow::before {
-        border-bottom-color: var(--primary-dark);
-    }
+    .loading-overlay.show { display: flex !important; }
 </style>
 
-<div class="row">
-    <div class="col-xl-10 col-lg-12 mx-auto">
-        <div class="card settings-card mb-5">
-            <div class="card-header">
-                <i class="fas fa-cog me-2" aria-hidden="true"></i>
-                <span class="icon-fallback">Settings</span>
-                <h4 class="mb-0">Website Settings</h4>
-            </div>
-            <div class="card-body position-relative">
-                <!-- Loading Overlay -->
-                <div class="loading-overlay" id="loading-overlay">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card settings-card">
+                <div class="card-header">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    Website Settings
                 </div>
 
-                <!-- Success Message -->
-                @if(session('status-success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert" aria-labelledby="success-alert">
-                        <strong id="success-alert">Success:</strong> {{ session('status-success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                <!-- Error Message -->
-                @if(session('status-error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert" aria-labelledby="error-alert">
-                        <strong id="error-alert">Error:</strong> {{ session('status-error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                <!-- Validation Errors -->
-                @if ($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert" aria-labelledby="validation-alert">
-                        <strong id="validation-alert">Validation Errors:</strong>
-                        <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                <form action="{{ route('admin.setting.store') }}" method="POST" enctype="multipart/form-data" id="settings-form" aria-describedby="form-description">
-                    @csrf
-                    <p id="form-description" class="visually-hidden">Form to update website settings including social media links, metadata, contact information, and logo.</p>
-
-                    <!-- Social Media Links Section -->
-                    <div class="form-section accordion" id="settingsAccordion">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="socialMediaHeading">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#socialMediaCollapse" aria-expanded="true" aria-controls="socialMediaCollapse">
-                                    <i class="fas fa-share-alt me-2" aria-hidden="true"></i>
-                                    <span class="icon-fallback">Social</span> Social Media Links
-                                </button>
-                            </h2>
-                            <div id="socialMediaCollapse" class="accordion-collapse collapse show" aria-labelledby="socialMediaHeading" data-bs-parent="#settingsAccordion">
-                                <div class="accordion-body">
-                                    <div class="row">
-                                        <div class="col-md-6 form-group mb-3">
-                                            <label for="facebook" data-bs-toggle="tooltip" title="Enter the full URL to your Facebook page">Facebook Link</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fab fa-facebook-f" aria-hidden="true"></i><span class="icon-fallback">FB</span></span>
-                                                <input type="url" class="form-control @error('facebook') is-invalid @enderror" name="facebook" id="facebook" placeholder="https://facebook.com/yourpage" value="{{ old('facebook', $settings->facebook ?? '') }}" aria-describedby="facebook-error">
-                                                @error('facebook')
-                                                    <div class="invalid-feedback" id="facebook-error">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 form-group mb-3">
-                                            <label for="instagram" data-bs-toggle="tooltip" title="Enter the full URL to your Instagram profile">Instagram Link</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fab fa-instagram" aria-hidden="true"></i><span class="icon-fallback">IG</span></span>
-                                                <input type="url" class="form-control @error('instagram') is-invalid @enderror" name="instagram" id="instagram" placeholder="https://instagram.com/yourprofile" value="{{ old('instagram', $settings->instagram ?? '') }}" aria-describedby="instagram-error">
-                                                @error('instagram')
-                                                    <div class="invalid-feedback" id="instagram-error">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 form-group mb-3">
-                                            <label for="twitter" data-bs-toggle="tooltip" title="Enter the full URL to your Twitter profile">Twitter Link</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fab fa-twitter" aria-hidden="true"></i><span class="icon-fallback">TW</span></span>
-                                                <input type="url" class="form-control @error('twitter') is-invalid @enderror" name="twitter" id="twitter" placeholder="https://twitter.com/yourprofile" value="{{ old('twitter', $settings->twitter ?? '') }}" aria-describedby="twitter-error">
-                                                @error('twitter')
-                                                    <div class="invalid-feedback" id="twitter-error">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 form-group mb-3">
-                                            <label for="youtube" data-bs-toggle="tooltip" title="Enter the full URL to your YouTube channel">YouTube Link</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fab fa-youtube" aria-hidden="true"></i><span class="icon-fallback">YT</span></span>
-                                                <input type="url" class="form-control @error('youtube') is-invalid @enderror" name="youtube" id="youtube" placeholder="https://youtube.com/yourchannel" value="{{ old('youtube', $settings->youtube ?? '') }}" aria-describedby="youtube-error">
-                                                @error('youtube')
-                                                    <div class="invalid-feedback" id="youtube-error">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 form-group mb-3">
-                                            <label for="linkedin" data-bs-toggle="tooltip" title="Enter the full URL to your LinkedIn page">LinkedIn Link</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fab fa-linkedin-in" aria-hidden="true"></i><span class="icon-fallback">LI</span></span>
-                                                <input type="url" class="form-control @error('linkedin') is-invalid @enderror" name="linkedin" id="linkedin" placeholder="https://linkedin.com/yourpage" value="{{ old('linkedin', $settings->linkedin ?? '') }}" aria-describedby="linkedin-error">
-                                                @error('linkedin')
-                                                    <div class="invalid-feedback" id="linkedin-error">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 form-group mb-3">
-                                            <label for="pinterest" data-bs-toggle="tooltip" title="Enter the full URL to your Pinterest profile">Pinterest Link</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="icon-fallback">PT</span></span>
-                                                <input type="url" class="form-control @error('pinterest') is-invalid @enderror" name="pinterest" id="pinterest" placeholder="https://pinterest.com/yourprofile" value="{{ old('pinterest', $settings->pinterest ?? '') }}" aria-describedby="pinterest-error">
-                                                @error('pinterest')
-                                                    <div class="invalid-feedback" id="pinterest-error">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 form-group mb-3">
-                                            <label for="tiktok" data-bs-toggle="tooltip" title="Enter the full URL to your TikTok profile">TikTok Link</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fab fa-tiktok" aria-hidden="true"></i><span class="icon-fallback">TT</span></span>
-                                                <input type="url" class="form-control @error('tiktok') is-invalid @enderror" name="tiktok" id="tiktok" placeholder="https://tiktok.com/yourprofile" value="{{ old('tiktok', $settings->tiktok ?? '') }}" aria-describedby="tiktok-error">
-                                                @error('tiktok')
-                                                    <div class="invalid-feedback" id="tiktok-error">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="card-body position-relative p-4">
+                    <div class="loading-overlay justify-content-center align-items-center" id="loading">
+                        <div class="spinner-border text-primary" style="width: 5rem; height: 5rem;">
+                            <span class="visually-hidden">Saving...</span>
                         </div>
-
-                        <!-- Website Metadata Section -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="metadataHeading">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#metadataCollapse" aria-expanded="false" aria-controls="metadataCollapse">
-                                    <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
-                                    <span class="icon-fallback">Metadata</span> Website Metadata
-                                </button>
-                            </h2>
-                            <div id="metadataCollapse" class="accordion-collapse collapse" aria-labelledby="metadataHeading" data-bs-parent="#settingsAccordion">
-                                <div class="accordion-body">
-                                    <div class="form-group mb-3">
-                                        <label for="title" data-bs-toggle="tooltip" title="The title displayed in the browser tab and search results">Website Title</label>
-                                        <input type="text" class="form-control @error('title') is-invalid @enderror" name="title" id="title" placeholder="My Website" value="{{ old('title', $settings->title ?? '') }}" aria-describedby="title-error">
-                                        @error('title')
-                                            <div class="invalid-feedback" id="title-error">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="website_description" data-bs-toggle="tooltip" title="A brief description of your website for SEO">Website Description</label>
-                                        <textarea class="form-control @error('website_description') is-invalid @enderror" name="website_description" id="website_description" rows="4" placeholder="Describe your website..." aria-describedby="website_description-error">{{ old('website_description', $settings->website_description ?? '') }}</textarea>
-                                        @error('website_description')
-                                            <div class="invalid-feedback" id="website_description-error">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="key_words" data-bs-toggle="tooltip" title="Comma-separated keywords for SEO">Keywords</label>
-                                        <input type="text" class="form-control @error('key_words') is-invalid @enderror" name="key_words" id="key_words" placeholder="keyword1, keyword2, keyword3" value="{{ old('key_words', $settings->key_words ?? '') }}" aria-describedby="key_words-error">
-                                        @error('key_words')
-                                            <div class="invalid-feedback" id="key_words-error">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                   <!-- Contact Information Section -->
-<div class="accordion-item">
-    <h2 class="accordion-header" id="contactHeading">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#contactCollapse">
-            Contact Information
-        </button>
-    </h2>
-    <div id="contactCollapse" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
-        <div class="accordion-body">
-
-            <!-- Phones -->
-            <div class="form-group mb-3">
-                <label>Phone Number</label>
-                <input type="tel" name="phone[]" class="form-control" placeholder="123-456-7890"
-                       value="{{ old('phone.0', $phones[0] ?? '') }}">
-            </div>
-
-            <div id="additional-phones">
-                @foreach($phones as $index => $phone)
-                    @if($index > 0)
-                    <div class="input-group mb-3 phone-item">
-                        <input type="tel" name="phone[]" class="form-control" value="{{ old("phone.$index", $phone) }}">
-                        <button type="button" class="btn btn-danger remove-phone">Remove</button>
                     </div>
+
+                    @if(session('status-success'))
+                        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4">
+                            <i class="bi bi-check-circle-fill me-2"></i> {{ session('status-success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
                     @endif
-                @endforeach
-            </div>
 
-            <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="add-phone">
-                Add Phone
-            </button>
-
-            <!-- Other fields -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label>Fax</label>
-                        <input type="tel" name="fax" class="form-control" value="{{ old('fax', $settings->fax ?? '') }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label>Email</label>
-                        <input type="email" name="email" class="form-control" value="{{ old('email', $settings->email ?? '') }}">
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label>Contact Form Email</label>
-                        <input type="email" name="contact_email" class="form-control" value="{{ old('contact_email', $settings->contact_email ?? '') }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label>Careers Email</label>
-                        <input type="email" name="carrers_email" class="form-control" value="{{ old('carrers_email', $settings->carrers_email ?? '') }}">
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group mb-3">
-                <label>Default Address (for SEO)</label>
-                <input type="text" name="address" class="form-control" value="{{ old('address', $settings->address ?? '') }}">
-            </div>
-
-            <div class="form-group mb-3">
-                <label>Site URL</label>
-                <input type="url" name="url" class="form-control" value="{{ old('url', $settings->url ?? '') }}">
-            </div>
-
-            <!-- Multiple Locations -->
-            <hr>
-            <h6 class="mt-4 mb-3">Branches / Locations</h6>
-            <div id="locations-container">
-                @foreach($settings->locations ?? [] as $index => $loc)
-                <div class="card mb-3 location-item">
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label>Name</label>
-                                <input type="text" name="locations[{{ $index }}][name]" class="form-control"
-                                       value="{{ old("locations.$index.name", $loc['name'] ?? '') }}" required>
-                            </div>
-                            <div class="col-md-5">
-                                <label>Address</label>
-                                <input type="text" name="locations[{{ $index }}][address]" class="form-control"
-                                       value="{{ old("locations.$index.address", $loc['address'] ?? '') }}">
-                            </div>
-                            <div class="col-md-2">
-                                <label>Lat</label>
-                                <input type="text" name="locations[{{ $index }}][lat]" class="form-control"
-                                       value="{{ old("locations.$index.lat", $loc['lat'] ?? '') }}" placeholder="31.9787532">
-                            </div>
-                            <div class="col-md-2">
-                                <label>Lng</label>
-                                <input type="text" name="locations[{{ $index }}][lng]" class="form-control"
-                                       value="{{ old("locations.$index.lng", $loc['lng'] ?? '') }}" placeholder="35.9004003">
-                            </div>
-                            <div class="col-md-1 d-flex align-items-end">
-                                <button type="button" class="btn btn-danger btn-sm remove-location">Remove</button>
-                            </div>
+                    @if($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4">
+                            <ul class="mb-0 ps-4">
+                                @foreach($errors->all() as $error)<li><i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $error }}</li>@endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
+                    @endif
 
-            <button type="button" class="btn btn-outline-primary btn-sm" id="add-location">
-                Add Location
-            </button>
-        </div>
-    </div>
-</div>
+                    <form action="{{ route('admin.setting.store') }}" method="POST" enctype="multipart/form-data" id="settingsForm">
+                        @csrf
 
-                        <!-- Logo Section -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="logoHeading">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#logoCollapse" aria-expanded="false" aria-controls="logoCollapse">
-                                    <i class="fas fa-image me-2" aria-hidden="true"></i>
-                                    <span class="icon-fallback">Logo</span> Logo
-                                </button>
-                            </h2>
-                            <div id="logoCollapse" class="accordion-collapse collapse" aria-labelledby="logoHeading" data-bs-parent="#settingsAccordion">
-                                <div class="accordion-body">
-                                    <div class="form-group mb-3">
-                                        <label for="logo" data-bs-toggle="tooltip" title="Upload a logo image (max 10MB, PNG/JPG/WEBP)">Logo</label>
-                                        <div class="logo-dropzone" id="logo-dropzone">
-                                            <p class="mb-0">Drag & Drop your logo here or click to upload</p>
-                                            <input type="file" class="form-control-file @error('logo') is-invalid @enderror" name="logo" id="logo" accept="image/png,image/jpeg,image/webp" aria-describedby="logo-error" hidden>
+                        <div class="accordion" id="settingsAccordion">
+
+                            <!-- 1. Social Media Links -->
+                            <div class="accordion-item border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button rounded-4" type="button" data-bs-toggle="collapse" data-bs-target="#socialCollapse">
+                                        <i class="bi bi-share-fill me-3"></i> Social Media Links
+                                    </button>
+                                </h2>
+                                <div id="socialCollapse" class="accordion-collapse collapse show" data-bs-parent="#settingsAccordion">
+                                    <div class="accordion-body pt-4">
+                                        <div class="row g-4">
+                                            <div class="col-md-6"><div class="social-input"><div class="social-icon facebook"><i class="bi bi-facebook"></i></div><input type="url" name="facebook" class="form-control" placeholder="https://facebook.com/yourpage" value="{{ old('facebook', $settings->facebook ?? '') }}"></div></div>
+                                            <div class="col-md-6"><div class="social-input"><div class="social-icon instagram"><i class="bi bi-instagram"></i></div><input type="url" name="instagram" class="form-control" placeholder="https://instagram.com/yourprofile" value="{{ old('instagram', $settings->instagram ?? '') }}"></div></div>
+                                            <div class="col-md-6"><div class="social-input"><div class="social-icon twitter"><i class="bi bi-twitter-x"></i></div><input type="url" name="twitter" class="form-control" placeholder="https://twitter.com/yourhandle" value="{{ old('twitter', $settings->twitter ?? '') }}"></div></div>
+                                            <div class="col-md-6"><div class="social-input"><div class="social-icon youtube"><i class="bi bi-youtube"></i></div><input type="url" name="youtube" class="form-control" placeholder="https://youtube.com/yourchannel" value="{{ old('youtube', $settings->youtube ?? '') }}"></div></div>
+                                            <div class="col-md-6"><div class="social-input"><div class="social-icon linkedin"><i class="bi bi-linkedin"></i></div><input type="url" name="linkedin" class="form-control" placeholder="https://linkedin.com/company" value="{{ old('linkedin', $settings->linkedin ?? '') }}"></div></div>
+                                            <div class="col-md-6"><div class="social-input"><div class="social-icon tiktok"><i class="bi bi-tiktok"></i></div><input type="url" name="tiktok" class="form-control" placeholder="https://tiktok.com/@yourprofile" value="{{ old('tiktok', $settings->tiktok ?? '') }}"></div></div>
                                         </div>
-                                        @error('logo')
-                                            <div class="invalid-feedback d-block" id="logo-error">{{ $message }}</div>
-                                        @enderror
-                                        <div class="logo-preview mt-3" id="logo-preview">
-                                            @if($settings && $settings->logo)
-                                                <img src="{{ asset($settings->logo) }}" alt="Current logo" width="200">
-                                                <div class="form-check mt-2">
-                                                    <input type="checkbox" class="form-check-input" name="remove_logo" id="remove_logo" value="1" aria-label="Remove current logo">
-                                                    <label class="form-check-label" for="remove_logo">Remove Logo</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Website Metadata -->
+                            <div class="accordion-item border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed rounded-4" type="button" data-bs-toggle="collapse" data-bs-target="#metaCollapse">
+                                        <i class="bi bi-file-earmark-text-fill me-3"></i> Website Metadata (SEO)
+                                    </button>
+                                </h2>
+                                <div id="metaCollapse" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                                    <div class="accordion-body">
+                                        <div class="row g-4">
+                                            <div class="col-12"><label class="form-label fw-semibold">Website Title</label><input type="text" name="title" class="form-control" value="{{ old('title', $settings->title ?? '') }}"></div>
+                                            <div class="col-12"><label class="form-label fw-semibold">Description</label><textarea name="website_description" class="form-control" rows="4">{{ old('website_description', $settings->website_description ?? '') }}</textarea></div>
+                                            <div class="col-12"><label class="form-label fw-semibold">Keywords (comma separated)</label><input type="text" name="key_words" class="form-control" value="{{ old('key_words', $settings->key_words ?? '') }}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Contact Information + Phones + Locations -->
+                            <div class="accordion-item border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed rounded-4" type="button" data-bs-toggle="collapse" data-bs-target="#contactCollapse">
+                                        <i class="bi bi-telephone-fill me-3"></i> Contact Information
+                                    </button>
+                                </h2>
+                                <div id="contactCollapse" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                                    <div class="accordion-body">
+
+                                        <!-- Phones -->
+                                        <div class="mb-5">
+                                            <label class="form-label fw-semibold d-block">Phone Numbers</label>
+                                            <div class="mb-3"><input type="tel" name="phone[]" class="form-control" placeholder="Main phone" value="{{ old('phone.0', $phones[0] ?? '') }}"></div>
+                                            <div id="additional-phones">
+                                                @foreach($phones as $i => $phone)
+                                                    @if($i > 0)
+                                                        <div class="input-group mb-3 phone-item">
+                                                            <input type="tel" name="phone[]" class="form-control" value="{{ old("phone.$i", $phone) }}">
+                                                            <button type="button" class="btn btn-outline-danger remove-phone">Remove</button>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" id="add-phone"><i class="bi bi-plus-circle"></i> Add Phone</button>
+                                        </div>
+
+                                        <div class="row g-4">
+                                            <div class="col-md-6"><label class="form-label fw-semibold">Email</label><input type="email" name="email" class="form-control" value="{{ old('email', $settings->email ?? '') }}"></div>
+                                            <div class="col-md-6"><label class="form-label fw-semibold">Fax</label><input type="tel" name="fax" class="form-control" value="{{ old('fax', $settings->fax ?? '') }}"></div>
+                                            <div class="col-md-6"><label class="form-label fw-semibold">Contact Form Email</label><input type="email" name="contact_email" class="form-control" value="{{ old('contact_email', $settings->contact_email ?? '') }}"></div>
+                                            <div class="col-md-6"><label class="form-label fw-semibold">Careers Email</label><input type="email" name="carrers_email" class="form-control" value="{{ old('carrers_email', $settings->carrers_email ?? '') }}"></div>
+                                            <div class="col-12"><label class="form-label fw-semibold">Address (for SEO)</label><input type="text" name="address" class="form-control" value="{{ old('address', $settings->address ?? '') }}"></div>
+                                            <div class="col-12"><label class="form-label fw-semibold">Site URL</label><input type="url" name="url" class="form-control" value="{{ old('url', $settings->url ?? '') }}"></div>
+                                        </div>
+
+                                        <hr class="my-5">
+                                        <h5 class="mb-4">Branches / Locations</h5>
+                                        <div id="locations-container">
+                                            @foreach($settings->locations ?? [] as $index => $loc)
+                                            <div class="card mb-3 location-item">
+                                                <div class="card-body">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-4"><label>Name</label><input type="text" name="locations[{{ $index }}][name]" class="form-control" value="{{ old("locations.$index.name", $loc['name'] ?? '') }}" required></div>
+                                                        <div class="col-md-5"><label>Address</label><input type="text" name="locations[{{ $index }}][address]" class="form-control" value="{{ old("locations.$index.address", $loc['address'] ?? '') }}"></div>
+                                                        <div class="col-md-2"><label>Lat</label><input type="text" name="locations[{{ $index }}][lat]" class="form-control" value="{{ old("locations.$index.lat", $loc['lat'] ?? '') }}" placeholder="31.9787532"></div>
+                                                        <div class="col-md-2"><label>Lng</label><input type="text" name="locations[{{ $index }}][lng]" class="form-control" value="{{ old("locations.$index.lng", $loc['lng'] ?? '') }}" placeholder="35.9004003"></div>
+                                                        <div class="col-md-1 d-flex align-items-end"><button type="button" class="btn btn-danger btn-sm remove-location w-100">Remove</button></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" id="add-location"><i class="bi bi-plus-circle"></i> Add Location</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Logo Upload -->
+                            <div class="accordion-item border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed rounded-4" type="button" data-bs-toggle="collapse" data-bs-target="#logoCollapse">
+                                        <i class="bi bi-image-fill me-3"></i> Logo
+                                    </button>
+                                </h2>
+                                <div id="logoCollapse" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                                    <div class="accordion-body text-center">
+                                        <div class="border-3 border-dashed border-primary rounded-4 p-5 mb-4" id="dropzone" style="cursor:pointer;">
+                                            <i class="bi bi-cloud-upload display-1 text-primary"></i>
+                                            <p class="mt-3 fw-semibold">Drop your logo here or click to upload</p>
+                                            <input type="file" name="logo" id="logoInput" accept="image/*" hidden>
+                                        </div>
+                                        <div id="logo-preview">
+                                            @if($settings->logo ?? false)
+                                                <img src="{{ asset($settings->logo) }}" alt="Current Logo" class="img-thumbnail rounded-4" style="max-height: 160px;">
+                                                <div class="form-check mt-3">
+                                                    <input class="form-check-input" type="checkbox" name="remove_logo" id="remove_logo">
+                                                    <label class="form-check-label" for="remove_logo">Remove current logo</label>
                                                 </div>
                                             @endif
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Form Buttons -->
-                    <div class="form-buttons">
-                        <button type="submit" class="btn btn-pill" aria-label="Save settings">
-                            <i class="fas fa-save me-2" aria-hidden="true"></i><span class="icon-fallback">Save</span> Save Settings
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-pill" onclick="confirmCancel()" aria-label="Cancel and reset form">
-                            <i class="fas fa-times me-2" aria-hidden="true"></i><span class="icon-fallback">Cancel</span> Cancel
-                        </button>
-                    </div>
-                </form>
+                        </div>
+
+                        <div class="text-end p-4 bg-light border-top mt-4 rounded-bottom">
+                            <button type="submit" class="btn btn-save px-5 shadow-lg">
+                                <i class="bi bi-check2-all me-2"></i> Save All Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("settings-form");
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('settingsForm');
+    const loading = document.getElementById('loading');
+    form.addEventListener('submit', () => loading.classList.add('show'));
 
-        // Debug form submission
-        form.addEventListener("submit", function(event) {
-            console.log("Form submitted");
-            const formData = new FormData(form);
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
-        });
-
-        // Check Font Awesome loading
-        if (!window.FontAwesome) {
-            console.warn("Font Awesome not loaded. Using fallback text.");
-            document.documentElement.setAttribute('data-fontawesome-loaded', 'false');
-        } else {
-            document.documentElement.setAttribute('data-fontawesome-loaded', 'true');
-        }
-
-        let phoneCount = {{ count($phones) }};
-        const maxPhones = 3;
-
-        // Initialize Bootstrap tooltips
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl, {
-            placement: 'top',
-            customClass: 'custom-tooltip'
-        }));
-
-        // Add phone number field
-        document.getElementById("add-phone-btn").addEventListener("click", function() {
-            if (phoneCount < maxPhones) {
-                phoneCount++;
-                let phoneFieldHTML = `
-                    <div class="form-group mb-3" id="phone${phoneCount}-container">
-                        <label for="phone${phoneCount}">Phone ${phoneCount}</label>
-                        <div class="input-group">
-                            <input type="tel" class="form-control" name="phone[]" id="phone${phoneCount}" placeholder="Phone Number" aria-describedby="phone${phoneCount}-error">
-                            <button type="button" class="btn btn-danger" onclick="removePhoneField(${phoneCount})" aria-label="Remove phone number"><i class="fas fa-trash" aria-hidden="true"></i><span class="icon-fallback">Remove</span></button>
-                        </div>
-                    </div>
-                `;
-                document.getElementById("additional-phones").insertAdjacentHTML('beforeend', phoneFieldHTML);
-            } else {
-                alert('You can add a maximum of 3 phone numbers.');
-            }
-        });
-
-        // Remove phone number field
-        window.removePhoneField = function(phoneIndex) {
-            document.getElementById(`phone${phoneIndex}-container`).remove();
-            phoneCount--;
-        };
-
-        // Show loading overlay on form submit
-        form.addEventListener("submit", function() {
-            document.getElementById("loading-overlay").style.display = "flex";
-        });
-
-        // Client-side validation
-        const urlInputs = document.querySelectorAll('input[type="url"]');
-        const emailInputs = document.querySelectorAll('input[type="email"]');
-        const phoneInputs = document.querySelectorAll('input[type="tel"]');
-
-        urlInputs.forEach(input => {
-            input.addEventListener("input", function() {
-                const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/i;
-                if (this.value && !urlPattern.test(this.value)) {
-                    this.classList.add('is-invalid');
-                    this.nextElementSibling.textContent = 'Please enter a valid URL (e.g., https://example.com)';
-                } else {
-                    this.classList.remove('is-invalid');
-                    if (this.value) this.classList.add('is-valid');
-                }
-            });
-        });
-
-        emailInputs.forEach(input => {
-            input.addEventListener("input", function() {
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (this.value && !emailPattern.test(this.value)) {
-                    this.classList.add('is-invalid');
-                    this.nextElementSibling.textContent = 'Please enter a valid email address';
-                } else {
-                    this.classList.remove('is-invalid');
-                    if (this.value) this.classList.add('is-valid');
-                }
-            });
-        });
-
-        phoneInputs.forEach(input => {
-            input.addEventListener("input", function() {
-                this.value = this.value.replace(/[^0-9-+\s]/g, '');
-                if (this.value && this.value.length < 7) {
-                    this.classList.add('is-invalid');
-                    this.nextElementSibling.textContent = 'Phone number must be at least 7 characters';
-                } else {
-                    this.classList.remove('is-invalid');
-                    if (this.value) this.classList.add('is-valid');
-                }
-            });
-        });
-
-        // Logo preview and drag-and-drop
-        const logoInput = document.getElementById("logo");
-        const logoDropzone = document.getElementById("logo-dropzone");
-        const logoPreview = document.getElementById("logo-preview");
-
-        logoDropzone.addEventListener("click", () => logoInput.click());
-
-        logoDropzone.addEventListener("dragover", (e) => {
-            e.preventDefault();
-            logoDropzone.classList.add("dragover");
-        });
-
-        logoDropzone.addEventListener("dragleave", () => {
-            logoDropzone.classList.remove("dragover");
-        });
-
-        logoDropzone.addEventListener("drop", (e) => {
-            e.preventDefault();
-            logoDropzone.classList.remove("dragover");
-            const file = e.dataTransfer.files[0];
-            if (file && (file.type === "image/png" || file.type === "image/jpeg")) {
-                logoInput.files = e.dataTransfer.files;
-                updateLogoPreview(file);
-            } else {
-                alert("Please upload a PNG or JPEG image.");
-            }
-        });
-
-        logoInput.addEventListener("change", function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                updateLogoPreview(file);
-            }
-        });
-
-        function updateLogoPreview(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.createElement("img");
-                img.src = e.target.result;
-                img.alt = "Logo preview";
-                img.width = 200;
-                logoPreview.innerHTML = '';
-                logoPreview.appendChild(img);
-                logoPreview.innerHTML += `
-                    <div class="form-check mt-2">
-                        <input type="checkbox" class="form-check-input" name="remove_logo" id="remove_logo" value="1" aria-label="Remove current logo">
-                        <label class="form-check-label" for="remove_logo">Remove Logo</label>
-                    </div>
-                `;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Confirm cancel action
-        window.confirmCancel = function() {
-            if (confirm("Are you sure you want to reset the form? All unsaved changes will be lost.")) {
-                form.reset();
-                document.getElementById("logo-preview").innerHTML = `
-                    @if($settings && $settings->logo)
-                        <img src="{{ asset($settings->logo) }}" alt="Current logo" width="200">
-                        <div class="form-check mt-2">
-                            <input type="checkbox" class="form-check-input" name="remove_logo" id="remove_logo" value="1" aria-label="Remove current logo">
-                            <label class="form-check-label" for="remove_logo">Remove Logo</label>
-                        </div>
-                    @endif
-                `;
-            }
-        };
+    // Add/Remove Phones
+    document.getElementById('add-phone')?.addEventListener('click', () => {
+        document.getElementById('additional-phones').insertAdjacentHTML('beforeend', `
+            <div class="input-group mb-3 phone-item">
+                <input type="tel" name="phone[]" class="form-control" placeholder="Additional phone">
+                <button type="button" class="btn btn-outline-danger remove-phone">Remove</button>
+            </div>`);
     });
-</script>
 
-<script>
-document.getElementById('add-location')?.addEventListener('click', function () {
-    const container = document.getElementById('locations-container');
-    const index = container.children.length;
-
-    const html = `
-        <div class="card mb-3 location-item">
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label>Name</label>
-                        <input type="text" name="locations[${index}][name]" class="form-control" required>
-                    </div>
-                    <div class="col-md-5">
-                        <label>Address</label>
-                        <input type="text" name="locations[${index}][address]" class="form-control">
-                    </div>
-                    <div class="col-md-2">
-                        <label>Lat</label>
-                        <input type="text" name="locations[${index}][lat]" class="form-control" placeholder="31.9787532">
-                    </div>
-                    <div class="col-md-2">
-                        <label>Lng</label>
-                        <input type="text" name="locations[${index}][lng]" class="form-control" placeholder="35.9004003">
-                    </div>
-                    <div class="col-md-1 d-flex align-items-end">
-                        <button type="button" class="btn btn-danger btn-sm remove-location">Remove</button>
+    // Add Location
+    document.getElementById('add-location')?.addEventListener('click', () => {
+        const index = document.querySelectorAll('.location-item').length;
+        document.getElementById('locations-container').insertAdjacentHTML('beforeend', `
+            <div class="card mb-3 location-item">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4"><label>Name</label><input type="text" name="locations[${index}][name]" class="form-control" required></div>
+                        <div class="col-md-5"><label>Address</label><input type="text" name="locations[${index}][address]" class="form-control"></div>
+                        <div class="col-md-2"><label>Lat</label><input type="text" name="locations[${index}][lat]" class="form-control" placeholder="31.9787532"></div>
+                        <div class="col-md-2"><label>Lng</label><input type="text" name="locations[${index}][lng]" class="form-control" placeholder="35.9004003"></div>
+                        <div class="col-md-1 d-flex align-items-end"><button type="button" class="btn btn-danger btn-sm remove-location w-100">Remove</button></div>
                     </div>
                 </div>
-            </div>
-        </div>
-    `;
-    container.insertAdjacentHTML('beforeend', html);
-});
+            </div>`);
+    });
 
-document.addEventListener('click', function (e) {
-    if (e.target.matches('.remove-location')) {
-        e.target.closest('.location-item').remove();
-    }
-    if (e.target.matches('.remove-phone')) {
-        e.target.closest('.phone-item').remove();
-    }
-});
+    // Remove any item
+    document.addEventListener('click', e => {
+        if (e.target.classList.contains('remove-phone') || e.target.classList.contains('remove-location')) {
+            e.target.closest('.phone-item, .location-item').remove();
+        }
+    });
 
-document.getElementById('add-phone')?.addEventListener('click', function () {
-    const html = `
-        <div class="input-group mb-3 phone-item">
-            <input type="tel" name="phone[]" class="form-control" placeholder="Phone Number">
-            <button type="button" class="btn btn-danger remove-phone">Remove</button>
-        </div>
-    `;
-    document.getElementById('additional-phones').insertAdjacentHTML('beforeend', html);
+    // Logo Dropzone & Preview
+    const dropzone = document.getElementById('dropzone');
+    const logoInput = document.getElementById('logoInput');
+    const preview = document.getElementById('logo-preview');
+
+    dropzone.addEventListener('click', () => logoInput.click());
+    ['dragover', 'dragenter'].forEach(evt => dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.style.background = '#f0e8ff'; }));
+    ['dragleave', 'dragend'].forEach(evt => dropzone.addEventListener(evt, () => dropzone.style.background = ''));
+    dropzone.addEventListener('drop', e => {
+        e.preventDefault(); dropzone.style.background = '';
+        if (e.dataTransfer.files[0]) { logoInput.files = e.dataTransfer.files; previewFile(e.dataTransfer.files[0]); }
+    });
+    logoInput.addEventListener('change', e => e.target.files[0] && previewFile(e.target.files[0]));
+
+    function previewFile(file) {
+        const reader = new FileReader();
+        reader.onload = e => preview.innerHTML = `<img src="${e.target.result}" class="img-thumbnail rounded-4" style="max-height:160px;">`;
+        reader.readAsDataURL(file);
+    }
 });
 </script>
 @endsection
