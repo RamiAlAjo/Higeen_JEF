@@ -410,9 +410,9 @@
                             <div class="price">{{ $product->display_price_formatted }} {{ $currency }}</div>
 
                             <button class="add-to-cart w-100"
-                                    onclick="event.preventDefault(); addToCart(this, {{ $product->id }})">
-                                Add to Cart
-                            </button>
+        onclick="event.preventDefault(); addToCart(this, {{ $product->id }})">
+    Add to Cart
+</button>
                         </div>
                     </article>
                 @endforeach
@@ -484,13 +484,15 @@
         const viewBtns = document.querySelectorAll('.view-btn');
         const savedView = localStorage.getItem('productView') || 'grid';
 
+        // Apply saved view
         container.className = savedView + '-view';
-        document.querySelector(`[data-view="${savedView}"]`).classList.add('active');
+        document.querySelector(`[data-view="${savedView}"]`)?.classList.add('active');
 
         viewBtns.forEach(btn => {
             btn.addEventListener('click', function () {
                 const view = this.dataset.view;
                 container.className = view + '-view';
+
                 viewBtns.forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 localStorage.setItem('productView', view);
@@ -501,51 +503,91 @@
             });
         });
 
+        // Apply list-mode class if needed
         if (savedView === 'list') {
             document.querySelectorAll('.product-card').forEach(c => c.classList.add('list-mode'));
         }
     });
 
+    // ──────────────────────────────────────────────────────────────
+    //  ADD TO CART – FIXED & ROBUST VERSION
+    // ──────────────────────────────────────────────────────────────
     function addToCart(button, productId) {
-        const original = button.innerHTML;
-        button.classList.add('loading');
-        button.disabled = true;
-        button.innerHTML = '';
+        const originalText = button.innerHTML.trim();
 
-        fetch('{{ route('cart.add') }}', {
+        // UI: loading state
+        button.disabled = true;
+        button.classList.add('loading');
+        button.innerHTML = ''; // spinner is added via CSS
+
+        fetch('{{ route('cart.add') }}', {   // make sure this route points to FrontCartController@add
             method: 'POST',
+            credentials: 'same-origin',           // essential for session cookie
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify({ product_id: productId, quantity: 1 })
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: 1
+            })
         })
-        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
         .then(data => {
+            // Success – update UI
             button.classList.remove('loading');
             button.classList.add('added');
             button.innerHTML = 'Added!';
-            updateCartBadge(data.cart_count || 0);
 
+            // Update cart badge (supports both cart_count & item_count)
+            const count = data.cart_count ?? data.item_count ?? 0;
+            updateCartBadge(count);
+
+            // Optional: dispatch event so mini-cart can refresh
+            document.dispatchEvent(new CustomEvent('cart-updated', { detail: { count, data } }));
+
+            // Revert button after 2 seconds
             setTimeout(() => {
                 button.classList.remove('added');
-                button.innerHTML = original;
+                button.innerHTML = originalText;
                 button.disabled = false;
             }, 2000);
         })
-        .catch(() => {
+        .catch(err => {
+            console.error('Add to cart failed:', err);
+
+            // Reset button
             button.classList.remove('loading');
-            button.innerHTML = original;
+            button.innerHTML = originalText;
             button.disabled = false;
-            alert('Failed to add to cart');
+
+            // User-friendly message
+            const message = err.message || err.error || 'Failed to add item to cart. Please try again.';
+            alert(message);
         });
     }
 
+    // ──────────────────────────────────────────────────────────────
+    //  UPDATE CART BADGE (header counter)
+    // ──────────────────────────────────────────────────────────────
     function updateCartBadge(count) {
         document.querySelectorAll('.cart-badge').forEach(badge => {
             badge.textContent = count;
             badge.style.display = count > 0 ? 'inline-block' : 'none';
         });
     }
+
+    // Optional: Listen for cart updates elsewhere (e.g. mini-cart dropdown)
+    document.addEventListener('cart-updated', function (e) {
+        // Example: refresh mini-cart via another endpoint
+        // if (typeof refreshMiniCart === 'function') refreshMiniCart();
+    });
 </script>
 @endsection
